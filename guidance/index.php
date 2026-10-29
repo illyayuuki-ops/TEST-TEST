@@ -26,15 +26,15 @@ function gh(string $name, mixed $value): string
 }
 function gf(string $name, string $label, string $type = 'text', mixed $value = '', string $attrs = ''): string
 {
-    return '<label class="field"><span>'.e($label).'</span><input name="'.e($name).'" type="'.e($type).'" value="'.e($value).'" '.$attrs.'></label>';
+    return '<label class="field"><span class="lbl">'.e($label).'</span><input name="'.e($name).'" type="'.e($type).'" value="'.e($value).'" '.$attrs.'></label>';
 }
 function ga(string $name, string $label, string $value = '', string $attrs = ''): string
 {
-    return '<label class="field"><span>'.e($label).'</span><textarea name="'.e($name).'" '.$attrs.'>'.e($value).'</textarea></label>';
+    return '<label class="field"><span class="lbl">'.e($label).'</span><textarea name="'.e($name).'" '.$attrs.'>'.e($value).'</textarea></label>';
 }
 function gs(string $name, string $label, array $items, mixed $value = '', string $attrs = ''): string
 {
-    $h = '<label class="field"><span>'.e($label).'</span><select name="'.e($name).'" '.$attrs.'>';
+    $h = '<label class="field"><span class="lbl">'.e($label).'</span><select name="'.e($name).'" '.$attrs.'>';
     foreach ($items as $key => $text) {
         $h .= '<option value="'.e($key).'"'.((string)$key === (string)$value ? ' selected' : '').'>'.e($text).'</option>';
     }return $h.'</select></label>';
@@ -53,24 +53,24 @@ function gl(string $view, string $text, int $id = 0, string $class = 'btn'): str
 }
 function gcard(string $title, string $body): string
 {
-    return '<section class="card gd-card"><h2>'.e($title).'</h2>'.$body.'</section>';
+    return '<section class="card gd-card"><div class="card-h"><h3>'.e($title).'</h3></div>'.$body.'</section>';
 }
 function gempty(string $text = 'No records yet.'): string
 {
-    return '<div class="gd-empty">'.e($text).'</div>';
+    return '<div class="empty gd-empty">'.e($text).'</div>';
 }
 function gtable(array $headers, array $rows): string
 {
     if (!$rows) {
         return gempty();
-    }$h = '<div class="gd-tablewrap"><table><thead><tr>';
+    }$h = '<div class="table-wrap gd-tablewrap"><table class="stack"><thead><tr>';
     foreach ($headers as $a) {
         $h .= '<th>'.e($a).'</th>';
     }$h .= '</tr></thead><tbody>';
     foreach ($rows as $row) {
         $h .= '<tr>';
-        foreach ($row as $cell) {
-            $h .= '<td>'.$cell.'</td>';
+        foreach ($row as $column => $cell) {
+            $h .= '<td data-label="'.e($headers[$column] ?? '').'"><div class="gd-cell">'.$cell.'</div></td>';
         }$h .= '</tr>';
     }return $h.'</tbody></table></div>';
 }
@@ -103,19 +103,28 @@ $students = $staff ? gall("SELECT id,full_name,school_id FROM users WHERE role='
 $certs = gall('SELECT * FROM gd_certificates WHERE user_id=? ORDER BY issued_at DESC', [$uid]);
 page_start($titles[$view], 'LCCT · Shared campus application · Guidance Office');
 ?>
-<link rel="stylesheet" href="<?= e(url('guidance/assets/guidance.css')) ?>">
+<link rel="stylesheet" href="<?= e(url('guidance/assets/guidance.css')) ?>?v=<?= (int)filemtime(__DIR__.'/assets/guidance.css') ?>">
 <div id="guidance" data-state="<?= e(url('guidance/state.php')) ?>" data-sig="<?= e($initialSignature) ?>" data-action="<?= e(url('guidance/action.php')) ?>" data-csrf="<?= e(csrf_token()) ?>">
 <?php if (getenv('LCCT_SYNTHETIC_TEST') === '1'): ?><div class="alert warn">Synthetic local review database. No real school records or email delivery.</div><?php endif; ?>
-<div class="gd-tabs"><?php foreach (['overview' => 'Overview','requests' => 'Requests','appointments' => 'Appointments','events' => 'Activities','history' => 'My participation','settings' => 'Settings'] as $v => $label) {
-    echo gl($v, $label, 0, 'btn'.($view === $v ? ' btn-primary' : ''));
-} ?></div>
 <?php
 if ($view === 'overview') {
-    echo '<div class="gd-hero"><div><span class="gd-eyebrow">YOUR SPACE FOR SUPPORT AND GROWTH</span><h1>Welcome to Guidance.</h1><p>Ask for support, make time for a conversation, and take your next step—with the same campus account.</p><div class="gd-buttons">'.(is_filer($u) ? '<a class="btn" href="'.e(url('student/new_ticket.php?office=guide')).'">New Guidance request</a>' : gl('requests', 'Open my queue')).gl('events', 'Explore activities').'</div></div><img src="'.e(url('assets/img/lcct-seal.png')).'" alt="Official LCCT seal"></div>';
-    echo '<div class="gd-stats">';
-    foreach ([[count(array_filter($cases, fn ($t) => !in_array($t['status'], ['Closed','Cancelled','Resolved'], true))),'Active authorized cases'],[count(array_filter($appointments, fn ($a) => in_array($a['status'], ['requested','confirmed'], true))),'Upcoming / requested appointments'],[count($events),'Visible activities'],[count($certs),'My certificates']] as [$n,$label]) {
-        echo '<div class="card"><span>'.e($label).'</span><b>'.$n.'</b></div>';
-    }echo '</div>';
+    $lastCaseUpdate = $cases ? max(array_column($cases, 'updated_at')) : null;
+    $heroActions = is_filer($u)
+        ? '<a class="btn btn-primary" href="'.e(url('student/new_ticket.php?office=guide')).'">New Guidance request</a>'
+        : gl('requests', 'Open my queue', 0, 'btn btn-primary');
+    $heroActions .= gl('events', 'Explore activities');
+    echo dash_hero('Guidance Office', 'Welcome to Guidance', 'Ask for support, make time for a conversation, and follow your Guidance activities using your campus account.', $lastCaseUpdate, $heroActions);
+    echo '<div class="stats">';
+    $summary = [
+        [count(array_filter($cases, fn ($t) => !in_array($t['status'], ['Closed','Cancelled','Resolved'], true))), 'Active requests', 'within your authorized access', 'blue', 'fa-inbox'],
+        [count(array_filter($appointments, fn ($a) => in_array($a['status'], ['requested','confirmed'], true))), 'Bookings', 'requested or confirmed', 'gold', 'fa-calendar'],
+        [count($events), 'Activities', 'available in your workspace', 'blue', 'fa-calendar-days'],
+        [count($certs), 'My certificates', 'earned participation records', 'green', 'fa-award']
+    ];
+    foreach ($summary as [$n,$label,$hint,$color,$icon]) {
+        echo '<div class="stat" style="--c:var(--'.e($color).')"><i class="fa-solid '.e($icon).' ic" aria-hidden="true"></i><div class="k">'.e($label).'</div><div class="v">'.$n.'</div><div class="s">'.e($hint).'</div></div>';
+    }
+    echo '</div>';
     echo '<div class="gd-grid">'.gcard('One connected service', '<p>Requests are stored in the existing <b>tickets</b> table. Replies, files, status tracking and the notification bell are the shared system’s own features.</p>'.gl('requests', 'View requests')).gcard('Private by design', '<p>Guidance cases are visible to their student owner, assigned counselor and Guidance head—not unrelated office staff or every administrator.</p><div class="gd-note">This is not an emergency service. For immediate danger, contact emergency services and a trusted adult or campus authority.</div>').'</div>';
 } elseif ($view === 'requests') {
     echo '<div class="gd-buttons">'.(is_filer($u) ? '<a class="btn btn-primary" href="'.e(url('student/new_ticket.php?office=guide')).'">New Guidance request</a>' : (in_array($staff, ['head','counselor'], true) ? gl('walkin', 'Record a walk-in') : '')).'</div>';
@@ -126,7 +135,7 @@ if ($view === 'overview') {
             $details .= gdetails('Rate this service', gform('feedback', gh('id', $t['id']).gs('rating', 'Rating', [1 => '1 / 5',2 => '2 / 5',3 => '3 / 5',4 => '4 / 5',5 => '5 / 5'], 5).ga('feedback', 'Feedback', '', 'maxlength="2000"'), 'Send feedback'));
         }$rows[] = [$details,e($t['requester']),e($t['category']),badge($t['status']),prio_badge($t['priority']),e($t['counselor'] ?: 'Awaiting assignment')];
     }
-    echo gcard('Shared Guidance tickets', '<label class="field"><span>Search this list</span><input data-search type="search" placeholder="Reference, subject or status…"></label>'.gtable(['Request','Requester','Service','Status','Priority','Counselor'], $rows));
+    echo gcard('Shared Guidance tickets', '<label class="field"><span class="lbl">Search this list</span><input data-search type="search" placeholder="Reference, subject or status…"></label>'.gtable(['Request','Requester','Service','Status','Priority','Counselor'], $rows));
     if (!$cases) {
         echo '<p class="muted">If you are a counselor, the head must assign a confidential case before it appears here.</p>';
     }

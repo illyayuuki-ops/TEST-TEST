@@ -93,6 +93,17 @@ function dash_hero(string $eyebrow, string $title, string $text, ?string $lastTs
         . ($lastTs ? '<small>' . e(time_ago($lastTs)) . '</small>' : '<small>No tickets yet</small>') . '</div></div></section>';
 }
 
+/** Guidance uses query-string views; leave other shared routes' matching unchanged. */
+function nav_is_active(string $currentPath, string $href): bool {
+    if ($currentPath !== 'guidance/index.php' || parse_url($href, PHP_URL_PATH) !== 'guidance/index.php') {
+        return $currentPath === $href;
+    }
+    parse_str((string)(parse_url($href, PHP_URL_QUERY) ?? ''), $linkQuery);
+    $view = (string)($_GET['view'] ?? 'overview');
+    $view = ['event' => 'events', 'walkin' => 'requests'][$view] ?? $view;
+    return ($linkQuery['view'] ?? 'overview') === $view;
+}
+
 function page_start(string $title, string $sub = '', string $actions = ''): void {
     global $pdo;
     $u = $_SESSION['user'];
@@ -120,7 +131,7 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
   <nav class="nav">
     <?php foreach (nav_for($u) as [$label, $href, $icon]): ?>
       <?php if ($href === null): ?><div class="nav-sec"><?= e($label) ?></div>
-      <?php else: ?><a href="<?= url($href) ?>" class="<?= $cur === $href ? 'active' : '' ?>"><i class="fa-solid <?= $icon ?>"></i><?= e($label) ?></a><?php endif; ?>
+      <?php else: $isActive = nav_is_active($cur, $href); ?><a href="<?= url($href) ?>" class="<?= $isActive ? 'active' : '' ?>"<?= $isActive ? ' aria-current="page"' : '' ?>><i class="fa-solid <?= $icon ?>"></i><?= e($label) ?></a><?php endif; ?>
     <?php endforeach; ?>
   </nav>
   <div class="sb-credit"><img height="30" src="<?= url('assets/img/intel-logo.png') ?>" alt="INTEL"><div>Powered by<b>INTEL</b></div></div>
