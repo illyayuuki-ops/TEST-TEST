@@ -53,6 +53,8 @@ function ticket_tracker(array $t, bool $full = false): string {
 }
 
 function nav_for(array $u): array {
+    if(is_filer($u)&&str_contains(str_replace('\\','/',$_SERVER['SCRIPT_NAME']??''),'/guidance/')) return array_merge(g_nav($u),[['Shared portal',null,null],['All my tickets','student/dashboard.php','fa-ticket'],['New ticket','student/new_ticket.php','fa-plus'],['Profile','student/profile.php','fa-id-badge'],['Password','auth/change_password.php','fa-key']]);
+    if ($u['role']==='admin' && ($u['office_code']??'')==='guide') return array_merge(g_nav($u),[['Password','auth/change_password.php','fa-key']]);
     if ($u['role'] === 'admin') {
         $nav = [
             ['Tickets', null, null],
@@ -71,6 +73,8 @@ function nav_for(array $u): array {
         ['My Tickets', 'student/dashboard.php', 'fa-ticket'],
         ['Ticket History', 'student/history.php', 'fa-clock-rotate-left'],
         ['New Ticket', 'student/new_ticket.php', 'fa-plus'],
+        ['Guidance Office', null, null],
+        ['Guidance services','guidance/index.php','fa-people-group'],
         ['Account', null, null],
         ['Profile', 'student/profile.php', 'fa-id-badge'],
         ['Password', 'auth/change_password.php', 'fa-key'],
@@ -130,11 +134,11 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
 </aside>
 <main class="main">
   <div class="topbar">
-    <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fa-solid fa-bars"></i></button>
+    <button class="menu-btn" aria-label="Open navigation" onclick="document.getElementById('sidebar').classList.toggle('open')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <div><div class="page-title"><?= e($title) ?></div><?php if ($sub): ?><div class="page-sub"><?= $sub ?></div><?php endif; ?></div>
     <div class="spacer"></div><?= $actions ?>
     <div class="bell" id="bell" data-ep="<?= e(url('notif.php')) ?>" data-csrf="<?= e(csrf_token()) ?>">
-      <button type="button" class="bell-btn" id="bellBtn" aria-haspopup="true" aria-expanded="false" title="Notifications"><i class="fa-solid fa-bell"></i><span class="bell-n" id="bellN"<?= $nUnread ? '' : ' hidden' ?>><?= $nUnread > 99 ? '99+' : $nUnread ?></span></button>
+      <button type="button" class="bell-btn" id="bellBtn" aria-haspopup="true" aria-expanded="false" title="Notifications"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="bell-n" id="bellN"<?= $nUnread ? '' : ' hidden' ?>><?= $nUnread > 99 ? '99+' : $nUnread ?></span></button>
       <div class="bell-menu" id="bellMenu" role="menu">
         <div class="bell-h"><b>Notifications</b><button type="button" id="bellAll" class="bell-all"<?= $nUnread ? '' : ' hidden' ?>>Mark all as read</button></div>
         <div class="bell-list" id="bellList"><?= notif_items_html($nItems) ?></div>
@@ -166,8 +170,10 @@ function live_signature(PDO $pdo, array $u, int $ticketId = 0): string {
         $q = $pdo->prepare('SELECT t.status, t.updated_at, t.assigned_to, t.priority, t.office_code, t.user_id, (SELECT COUNT(*) FROM replies r WHERE r.ticket_id=t.id' . ($isAdmin ? '' : ' AND r.is_internal=0') . ') AS n FROM tickets t WHERE t.id=?');
         $q->execute([$ticketId]); $t = $q->fetch();
         if (!$t || ($isAdmin ? $t['office_code'] !== ($u['office_code'] ?? null) : (int)$t['user_id'] !== (int)$u['id'])) return '';
+        if ($t['office_code']==='guide'&&!g_case($u,$t)) return '';
         return md5(implode('|', [$t['status'], $t['updated_at'], $t['assigned_to'], $t['priority'], $t['n']]));
     }
+    if ($isAdmin && ($u['office_code']??'')==='guide') return g_signature($u);
     $q = $pdo->prepare('SELECT COUNT(*) n, COALESCE(MAX(updated_at),0) m, COALESCE(GROUP_CONCAT(status ORDER BY id SEPARATOR \',\'),\'\') s FROM tickets WHERE ' . ($isAdmin ? 'office_code=?' : 'user_id=?'));
     $q->execute([$isAdmin ? ($u['office_code'] ?? '') : (int)$u['id']]); $r = $q->fetch();
     return md5($r['n'] . '|' . $r['m'] . '|' . $r['s']);
@@ -185,8 +191,11 @@ function live_refresh_script(): void {
     ?>
 <script>
 (function(){
-  var sig=<?= json_encode($sig) ?>, ep=<?= json_encode(url('live.php') . ($tid ? '?t=' . $tid : '')) ?>, EVERY=8000, busy=false, bar=null;
+  var sig=<?= json_encode($sig) ?>, ep=<?= json_encode(url('live.php') . ($tid ? '?t=' . $tid : '')) ?>, EVERY=3000, busy=false, bar=null, dirty=false;
+  document.addEventListener('input',function(e){if(e.target.closest('form')&&e.target.name!=='csrf')dirty=true});
+  document.addEventListener('change',function(e){if(e.target.closest('form'))dirty=true});
   function typing(){
+    if(dirty)return true;
     var a=document.activeElement; if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=='checkbox'&&a.type!=='button'&&a.type!=='submit') return true;
     var f=document.querySelectorAll('#replybox textarea, form textarea'); for(var i=0;i<f.length;i++) if(f[i].value.trim()) return true;
     return !!document.querySelector('.modal-bg.open');
@@ -195,7 +204,7 @@ function live_refresh_script(): void {
     if(bar) return; bar=document.createElement('div');
     bar.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#1B3355;color:#fff;padding:10px 16px;border-radius:999px;font:600 13px/1.2 sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer';
     bar.innerHTML='<i class="fa-solid fa-rotate"></i>&nbsp; This page has new updates. Tap to refresh.';
-    bar.onclick=function(){location.reload()}; document.body.appendChild(bar);
+    bar.onclick=function(){if(!typing()||confirm('Discard your unsaved changes and refresh?'))location.reload()}; document.body.appendChild(bar);
   }
   function tick(){
     if(busy||document.hidden||!sig) return; busy=true;
@@ -204,7 +213,7 @@ function live_refresh_script(): void {
       if(typing()) notice(); else location.reload();
     }).catch(function(){busy=false});
   }
-  setInterval(tick,EVERY);
+  setInterval(tick,EVERY);window.addEventListener('focus',tick);window.addEventListener('online',tick);
   document.addEventListener('visibilitychange',function(){if(!document.hidden) tick()});
 })();
 </script>

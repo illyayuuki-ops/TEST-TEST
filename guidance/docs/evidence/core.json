@@ -1,0 +1,126 @@
+{
+    "passed": 30,
+    "total": 30,
+    "checks": [
+        {
+            "name": "Shared Guidance readiness marker",
+            "passed": true
+        },
+        {
+            "name": "Exactly 14 gd tables",
+            "passed": true
+        },
+        {
+            "name": "Head case permission",
+            "passed": true
+        },
+        {
+            "name": "Assigned counselor case permission",
+            "passed": true
+        },
+        {
+            "name": "Administrator not clinical",
+            "passed": true
+        },
+        {
+            "name": "Owner permission",
+            "passed": true
+        },
+        {
+            "name": "Unassigned counselor denied",
+            "passed": true
+        },
+        {
+            "name": "Integer validation",
+            "passed": true
+        },
+        {
+            "name": "Integer suffix rejected",
+            "passed": true
+        },
+        {
+            "name": "Array input rejected",
+            "passed": true
+        },
+        {
+            "name": "Invalid enum rejected",
+            "passed": true
+        },
+        {
+            "name": "Impossible date rejected",
+            "passed": true
+        },
+        {
+            "name": "Timezone suffix rejected",
+            "passed": true
+        },
+        {
+            "name": "Philippine local date conversion",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 3d5355",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 2b31",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 2d32",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 405355",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 203d53",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 097465",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense 0a7465",
+            "passed": true
+        },
+        {
+            "name": "CSV formula defense efbbbf",
+            "passed": true
+        },
+        {
+            "name": "CSV normal Unicode preserved",
+            "passed": true
+        },
+        {
+            "name": "Transactions really roll back",
+            "passed": true
+        },
+        {
+            "name": "Rate allows first",
+            "passed": true
+        },
+        {
+            "name": "Rate allows second",
+            "passed": true
+        },
+        {
+            "name": "Rate blocks third",
+            "passed": true
+        },
+        {
+            "name": "Reports include SLA and response metrics",
+            "passed": true
+        },
+        {
+            "name": "Reports contain no counseling text",
+            "passed": true
+        },
+        {
+            "name": "Shared priorities intentionally retained",
+            "passed": true
+        }
+    ]
+}

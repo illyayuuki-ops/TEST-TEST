@@ -2,16 +2,21 @@
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
+    ini_set('session.use_strict_mode','1');
+    session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax','secure'=>!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off']);
     session_start();
 }
 date_default_timezone_set('Asia/Manila');
 
-/* ── Settings (edit for your server) ───────────────────────────── */
-const DB_HOST = 'sql104.infinityfree.com';
-const DB_NAME = 'if0_43107666_lccticketing';
-const DB_USER = 'if0_43107666';
-const DB_PASS = 'fEUTCJCopjz';
+/* Shared settings: credentials belong in the local environment, never Git. */
+$local = is_file(__DIR__.'/local.php') ? require __DIR__.'/local.php' : [];
+if (!is_array($local)) throw new RuntimeException('Local configuration must return an array.');
+if (!empty($local['SYNTHETIC_TEST'])) putenv('LCCT_SYNTHETIC_TEST=1');
+define('DB_PORT', (int)($local['DB_PORT'] ?? getenv('LCCT_DB_PORT') ?: 3306));
+define('DB_HOST', $local['DB_HOST'] ?? getenv('LCCT_DB_HOST') ?: '127.0.0.1');
+define('DB_NAME', $local['DB_NAME'] ?? getenv('LCCT_DB_NAME') ?: 'lcct_guidance_v2_test');
+define('DB_USER', $local['DB_USER'] ?? getenv('LCCT_DB_USER') ?: 'lcct_guidance_dev');
+define('DB_PASS', $local['DB_PASS'] ?? getenv('LCCT_DB_PASSWORD') ?: '');
 const APP_NAME_A = 'LCCT';
 const APP_NAME_B = 'icketing';
 const MAX_ATTEMPTS = 5;     // failed logins before lockout
@@ -24,8 +29,8 @@ const SCHOOL_EMAIL_DOMAIN = 'lcctanauan.edu.ph';   // students must register wit
 const VERIFY_HOURS   = 24;                          // how long the email confirmation link works
 const RESET_MINUTES  = 60;                          // how long a password-reset link works
 const CARD_MAX_BYTES = 3 * 1024 * 1024;             // profile photo size limit (3 MB)
-const BREVO_API_KEY  = 'eyJhcGlfa2V5IjoieGtleXNpYi0xMDhjMzQ2OTVjZGFjNGU4YTlmM2NiZjc3YjU5ZTdjOGM4Y2Y2NjUxN2U1OWQ2Njk1YzM5NzFkNDg4YzU4YzJhLWNMYjFGVjZkTXVZUk1NbFUifQ==';                          // paste your Brevo API key here so confirmation emails can be sent (see README_SETUP.txt)
-const MAIL_FROM      = '24-12803@lcctanauan.edu.ph';                          // sender address verified in Brevo
+define('BREVO_API_KEY', $local['BREVO_API_KEY'] ?? getenv('LCCT_BREVO_API_KEY') ?: '');
+define('MAIL_FROM', $local['MAIL_FROM'] ?? getenv('LCCT_MAIL_FROM') ?: '');
 const MAIL_FROM_NAME = 'LCCT Ticketing';
 
 /* Categories live in the `categories` table (one list per office).
@@ -99,8 +104,9 @@ if (!function_exists('mb_strlen'))     { function mb_strlen($s) { return strlen(
 if (!function_exists('mb_strimwidth')) { function mb_strimwidth($s, $st, $w, $trim = '') { $s = (string)$s; return strlen($s) > $w ? substr($s, $st, $w - strlen($trim)) . $trim : $s; } }
 
 /* ── Database ──────────────────────────────────────────────────── */
+if (getenv('LCCT_SYNTHETIC_TEST')==='1' && (!in_array(DB_HOST,['127.0.0.1','localhost','::1'],true)||!str_ends_with(DB_NAME,'_test'))) exit('Synthetic mode requires a local _test database.');
 try {
-    $pdo = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS, [
+    $pdo = new PDO('mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
@@ -115,6 +121,10 @@ require_once __DIR__ . '/../includes/audit.php';
 require_once __DIR__ . '/../includes/notifications.php';
 require_once __DIR__ . '/../includes/mail.php';
 require_once __DIR__ . '/../includes/attachments.php';
+require_once __DIR__ . '/../includes/guidance.php';
+g_session_check();
+header('Cache-Control: no-store');
+header('X-Content-Type-Options: nosniff');
 
 /* ── Helpers ───────────────────────────────────────────────────── */
 function e($v): string { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
@@ -158,7 +168,7 @@ function csrf_check(): void {
 
 function home_for(string $role): string {
     return match ($role) {
-        'admin'       => 'admin/dashboard.php',
+        'admin'       => (($_SESSION['user']['office_code']??'')==='guide' ? 'guidance/index.php' : 'admin/dashboard.php'),
         default       => 'student/dashboard.php',
     };
 }
@@ -167,6 +177,11 @@ function home_for(string $role): string {
 function require_role(string ...$roles): array {
     $u = $_SESSION['user'] ?? null;
     if (!$u) redirect('auth/login.php');
+    if (($u['role']??'')==='admin' && ($u['office_code']??'')==='guide' && str_contains(str_replace('\\','/',$_SERVER['SCRIPT_NAME']??''),'/admin/')) {
+        if ($_SERVER['REQUEST_METHOD']==='POST') g_denied('Use the Guidance workspace for these actions.');
+        $map=['dashboard.php'=>'requests','records.php'=>'requests','reports.php'=>'reports','categories.php'=>'categories','team.php'=>'team','audit.php'=>'audit'];
+        redirect('guidance/index.php?view='.($map[basename($_SERVER['SCRIPT_NAME'])]??'overview'));
+    }
     $r = in_array($u['role'], ['student', 'alumni'], true) ? 'student' : $u['role'];
     if (!in_array($r, $roles, true)) redirect(home_for($u['role']));
     // re-check the account is still active
@@ -265,6 +280,11 @@ function valid_code(string $c): bool { return (bool)preg_match('/^[a-z0-9_]{2,30
 /** Change a ticket's status in one place: keeps resolved_at right, writes the audit log and emails the requester. $t needs id, code, status. */
 function change_ticket_status(PDO $pdo, array $t, string $ns, ?array $actor = null, bool $notify = true): bool {
     if (!in_array($ns, STATUSES, true) || $ns === $t['status']) return false;
+    $guide = gone("SELECT status FROM tickets WHERE id=? AND office_code='guide'",[$t['id']]);
+    if ($guide) {
+        $flow=['Open'=>['In Progress','Waiting for User','Escalated','Resolved','Cancelled'],'Reopened'=>['In Progress','Waiting for User','Escalated','Resolved','Cancelled'],'In Progress'=>['Waiting for User','Escalated','Resolved'],'Waiting for User'=>['In Progress','Escalated','Resolved','Closed'],'Escalated'=>['In Progress','Waiting for User','Resolved'],'Resolved'=>['Closed','Reopened'],'Closed'=>['Reopened'],'Cancelled'=>[]];
+        if (!in_array($ns,$flow[$guide['status']]??[],true)) return false;
+    }
     $resolved = in_array($ns, ['Resolved', 'Closed'], true);
     $pdo->prepare('UPDATE tickets SET status=?, resolved_at=' . ($resolved ? 'COALESCE(resolved_at,NOW())' : 'NULL') . ' WHERE id=?')->execute([$ns, $t['id']]);
     audit('TICKET_STATUS', "{$t['code']}: {$t['status']} → $ns", $actor);
@@ -304,7 +324,7 @@ function can_reopen(array $t): bool {
 
 /** Close tickets that waited too long for the student. $scope may hold user_id, office_code and/or id. Cheap; runs when the student or office opens their pages. */
 function auto_close_waiting(PDO $pdo, array $scope = []): int {
-    $sql = "SELECT id, code FROM tickets WHERE status='Waiting for User' AND updated_at < (NOW() - INTERVAL " . (int)WAITING_AUTOCLOSE_DAYS . ' DAY)';
+    $sql = "SELECT id, code FROM tickets WHERE office_code<>'guide' AND status='Waiting for User' AND updated_at < (NOW() - INTERVAL " . (int)WAITING_AUTOCLOSE_DAYS . ' DAY)';
     $p = [];
     foreach (['user_id', 'office_code', 'id'] as $k) if (isset($scope[$k])) { $sql .= " AND $k=?"; $p[] = $scope[$k]; }
     $s = $pdo->prepare($sql . ' LIMIT 50'); $s->execute($p); $n = 0;
@@ -319,4 +339,4 @@ function auto_close_waiting(PDO $pdo, array $scope = []): int {
 }
 
 /* Set to false once everything works. While true, a crash on the ticket page shows its error message instead of a blank page. */
-const DEBUG_ERRORS = true;
+const DEBUG_ERRORS = false;

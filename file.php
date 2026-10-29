@@ -6,6 +6,9 @@ $isAdmin = $u['role'] === 'admin';
 $s = $pdo->prepare('SELECT f.*, t.user_id AS owner_id, t.office_code, COALESCE(r.is_internal,0) AS internal FROM ticket_files f JOIN tickets t ON t.id=f.ticket_id LEFT JOIN replies r ON r.id=f.reply_id WHERE f.id=?');
 try { $s->execute([(int)($_GET['id'] ?? 0)]); $f = $s->fetch(); } catch (Throwable $e) { $f = false; }
 $allowed = $f && ($isAdmin ? $f['office_code'] === $u['office_code'] : ((int)$f['owner_id'] === $u['id'] && !$f['internal']));
+$case = $f ? gone('SELECT * FROM tickets WHERE id=?',[$f['ticket_id']]) : null;
+if ($case && $case['office_code']==='guide') $allowed=$allowed&&g_case($u,$case);
+header('Cache-Control: no-store');
 $path = $allowed ? attach_dir() . '/' . basename($f['stored_name']) : '';
 if (!$allowed || !is_file($path)) { http_response_code(404); exit('File not found.'); }
 header('Content-Type: ' . $f['mime']);

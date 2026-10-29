@@ -1,0 +1,538 @@
+{
+  "passed": 133,
+  "total": 133,
+  "checks": [
+    {
+      "name": "anonymous login required",
+      "passed": true
+    },
+    {
+      "name": "private path blocked config/app.php",
+      "passed": true
+    },
+    {
+      "name": "private path blocked config/local.php",
+      "passed": true
+    },
+    {
+      "name": "private path blocked database/ticketdesk.sql",
+      "passed": true
+    },
+    {
+      "name": "private path blocked .git/HEAD",
+      "passed": true
+    },
+    {
+      "name": "private path blocked guidance/domain.php",
+      "passed": true
+    },
+    {
+      "name": "private path blocked guidance/tests/setup.php",
+      "passed": true
+    },
+    {
+      "name": "private path blocked uploads/ticket_files/anything.pdf",
+      "passed": true
+    },
+    {
+      "name": "shared login student_one",
+      "passed": true
+    },
+    {
+      "name": "shared login student_two",
+      "passed": true
+    },
+    {
+      "name": "shared login guide_head",
+      "passed": true
+    },
+    {
+      "name": "shared login guide_counselor",
+      "passed": true
+    },
+    {
+      "name": "shared login guide_other",
+      "passed": true
+    },
+    {
+      "name": "shared login guide_admin",
+      "passed": true
+    },
+    {
+      "name": "shared login sao_demo",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php status 200",
+      "passed": true
+    },
+    {
+      "name": "server explicitly synthetic",
+      "passed": true
+    },
+    {
+      "name": "page admin/dashboard.php status 200",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php status 403",
+      "passed": true
+    },
+    {
+      "name": "page admin/reports.php status 200",
+      "passed": true
+    },
+    {
+      "name": "Guidance admin legacy report path uses Guidance reports",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=team status 403",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=categories status 403",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=privacy status 403",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=audit status 403",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=reports status 403",
+      "passed": true
+    },
+    {
+      "name": "CSRF enforced",
+      "passed": true
+    },
+    {
+      "name": "shared form student/new_ticket.php 302",
+      "passed": true
+    },
+    {
+      "name": "page student/dashboard.php status 200",
+      "passed": true
+    },
+    {
+      "name": "same ticket visible in native student dashboard",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=requests status 200",
+      "passed": true
+    },
+    {
+      "name": "same ticket visible in Guidance workspace",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 200",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 404",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 404",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 404",
+      "passed": true
+    },
+    {
+      "name": "other user/office native ticket denied",
+      "passed": true
+    },
+    {
+      "name": "other user/office native ticket denied",
+      "passed": true
+    },
+    {
+      "name": "shared attachment downloads for owner",
+      "passed": true
+    },
+    {
+      "name": "page file.php?id=9 status 404",
+      "passed": true
+    },
+    {
+      "name": "page file.php?id=9 status 404",
+      "passed": true
+    },
+    {
+      "name": "page file.php?id=9 status 404",
+      "passed": true
+    },
+    {
+      "name": "page file.php?id=9 status 404",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 200",
+      "passed": true
+    },
+    {
+      "name": "page file.php?id=9 status 200",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 404",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 403",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "page file.php?id=10 status 404",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 200",
+      "passed": true
+    },
+    {
+      "name": "internal notes excluded from requester",
+      "passed": true
+    },
+    {
+      "name": "internal note hidden from personal export",
+      "passed": true
+    },
+    {
+      "name": "private ticket live endpoint reveals no signature",
+      "passed": true
+    },
+    {
+      "name": "private ticket live endpoint reveals no signature",
+      "passed": true
+    },
+    {
+      "name": "private ticket live endpoint reveals no signature",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=19 status 200",
+      "passed": true
+    },
+    {
+      "name": "native text escaped",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "invalid status transition refused",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "action feedback expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "native close shared with Guidance",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "native reopen shared with Guidance",
+      "passed": true
+    },
+    {
+      "name": "action walkin expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "walk-in owner is selected student",
+      "passed": true
+    },
+    {
+      "name": "shared form student/new_ticket.php 302",
+      "passed": true
+    },
+    {
+      "name": "page ticket.php?id=21 status 200",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=21 302",
+      "passed": true
+    },
+    {
+      "name": "Guidance cannot view SAO case",
+      "passed": true
+    },
+    {
+      "name": "page admin/reports.php status 200",
+      "passed": true
+    },
+    {
+      "name": "page admin/records.php status 200",
+      "passed": true
+    },
+    {
+      "name": "page admin/categories.php status 200",
+      "passed": true
+    },
+    {
+      "name": "page admin/team.php status 200",
+      "passed": true
+    },
+    {
+      "name": "page admin/audit.php status 200",
+      "passed": true
+    },
+    {
+      "name": "action appointment.create expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action appointment.create expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action appointment.update expected 403 actual 403",
+      "passed": true
+    },
+    {
+      "name": "action appointment.update expected 404 actual 404",
+      "passed": true
+    },
+    {
+      "name": "action appointment.update expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action appointment.update expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action appointment.update expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action program.save expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action event.save expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action invite expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action invite expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action rsvp expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action rsvp expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "venue code hidden from requester before checkin",
+      "passed": true
+    },
+    {
+      "name": "action checkin expected 400 actual 400",
+      "passed": true
+    },
+    {
+      "name": "action checkin expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action rsvp expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action attendance expected 403 actual 403",
+      "passed": true
+    },
+    {
+      "name": "action attendance expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action certificates expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action event.save expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action event.save expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action certificates expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action certificates expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "page guidance/certificate.php?id=5 status 200",
+      "passed": true
+    },
+    {
+      "name": "page guidance/certificate.php?id=5 status 404",
+      "passed": true
+    },
+    {
+      "name": "action event.save expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action attendance expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action article.save expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action article.save expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=knowledge status 200",
+      "passed": true
+    },
+    {
+      "name": "draft hidden",
+      "passed": true
+    },
+    {
+      "name": "page guidance/export.php?type=reports status 200",
+      "passed": true
+    },
+    {
+      "name": "report has no case subject or student identity",
+      "passed": true
+    },
+    {
+      "name": "page guidance/export.php?type=reports status 403",
+      "passed": true
+    },
+    {
+      "name": "action privacy.submit expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "action privacy.review expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php?view=settings status 200",
+      "passed": true
+    },
+    {
+      "name": "review visible to requester",
+      "passed": true
+    },
+    {
+      "name": "action preferences expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "shared form ticket.php?id=19 302",
+      "passed": true
+    },
+    {
+      "name": "ticket update preference honored",
+      "passed": true
+    },
+    {
+      "name": "action staff.save expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action staff.save expected 409 actual 409",
+      "passed": true
+    },
+    {
+      "name": "action staff.create expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "shared login review_7723d775",
+      "passed": true
+    },
+    {
+      "name": "new staff forced password change",
+      "passed": true
+    },
+    {
+      "name": "shared form auth/change_password.php 302",
+      "passed": true
+    },
+    {
+      "name": "shared login review_7723d775",
+      "passed": true
+    },
+    {
+      "name": "page guidance/index.php status 200",
+      "passed": true
+    },
+    {
+      "name": "action sessions expected 200 actual 200",
+      "passed": true
+    },
+    {
+      "name": "all-session revocation includes old cookie",
+      "passed": true
+    },
+    {
+      "name": "shared login student_one",
+      "passed": true
+    },
+    {
+      "name": "logout revokes cookie replay",
+      "passed": true
+    },
+    {
+      "name": "unknown-account persistent rate limit",
+      "passed": true
+    }
+  ]
+}

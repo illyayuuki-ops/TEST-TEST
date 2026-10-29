@@ -1,0 +1,11 @@
+Options -Indexes
+<FilesMatch "^(config\.local\.php|\.env.*|source\.zip)$|\.(sql|log|bak|ini|lcctgd)$">
+ Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+ RewriteEngine On
+ RewriteRule (^|/)\. - [F,L]
+ RewriteRule ^(config|database|includes)/ - [F,L]
+ RewriteRule ^guidance/(tests|docs|migrations|runtime)/ - [F,L]
+ RewriteRule ^guidance/(domain|migrate|backup|jobs|setup-local|dev-router)\.php$ - [F,L]
+</IfModule>

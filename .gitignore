@@ -1,0 +1,26 @@
+
+# Private/local material: never publish credentials, records, or source archives.
+.env
+.env.*
+!.env.example
+config.local.php
+config/local.php
+*.log
+*.sql.gz
+*.sqlite*
+*.lcct
+*.lcctgd
+source.zip
+node_modules/
+vendor/
+guidance/runtime/
+guidance/tests/output/
+
+# Public audited QR vendors must be included, unlike server dependency folders.
+!guidance/assets/vendor/
+!guidance/assets/vendor/*
+# Uploaded runtime files are records, not source code.
+uploads/ticket_files/*
+!uploads/ticket_files/.htaccess
+uploads/avatars/*
+!uploads/avatars/.htaccess

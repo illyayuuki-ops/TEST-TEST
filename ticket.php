@@ -8,7 +8,7 @@ if (DEBUG_ERRORS) {
 $u = require_role('student', 'admin');
 $isAdmin = $u['role'] === 'admin';
 
-try { auto_close_waiting($pdo, ['id' => (int)($_GET['id'] ?? 0)]); } catch (Throwable $x) { error_log('auto_close_waiting: ' . $x->getMessage()); }   // no reply for a week → closed (student can reopen)
+
 $st = $pdo->prepare('SELECT t.*, COALESCE(c.name,\'Uncategorized\') AS category, o.office_name, o.brand_color, o.brand_icon, o.status AS office_status, us.full_name AS filer_name, us.role AS filer_role, us.school_id, us.email AS filer_email, asg.full_name AS assignee_name
                      FROM tickets t JOIN offices o ON o.office_code=t.office_code JOIN users us ON us.id=t.user_id LEFT JOIN users asg ON asg.id=t.assigned_to LEFT JOIN categories c ON c.id=t.category_id WHERE t.id=?');
 $st->execute([(int)($_GET['id'] ?? 0)]);
@@ -17,12 +17,21 @@ $t = $st->fetch();
 if (!$t || ($isAdmin ? $t['office_code'] !== $u['office_code'] : (int)$t['user_id'] !== $u['id'])) {
     flash('Ticket not found.', 'err'); redirect(home_for($u['role']));
 }
+if ($t['office_code']==='guide' && !g_case($u,$t)) g_denied('Ticket not found.',404);
 $id = (int)$t['id'];
+try { auto_close_waiting($pdo, ['id' => (int)($_GET['id'] ?? 0)]); } catch (Throwable $x) { error_log('auto_close_waiting: ' . $x->getMessage()); }   // no reply for a week → closed (student can reopen)
 $locked = $t['status'] === 'Cancelled' || ($t['status'] === 'Closed' && ($isAdmin || !can_reopen($t)));   // students may still answer a closed ticket for a while, which reopens it
 $team = [];   // admins of this office who can be assigned the ticket
-if ($isAdmin) { $tm = $pdo->prepare("SELECT id, full_name FROM users WHERE role='admin' AND office_code=? AND status='active' ORDER BY full_name"); $tm->execute([$t['office_code']]); $team = $tm->fetchAll(); }
+if ($isAdmin) { $tm = $pdo->prepare("SELECT id, full_name FROM users WHERE role='admin' AND office_code=? AND status='active' ORDER BY full_name"); $tm->execute([$t['office_code']]); $team = $tm->fetchAll(); if ($t['office_code']==='guide') $team=array_values(array_filter($team,fn($a)=>gone("SELECT user_id FROM gd_staff WHERE user_id=? AND active=1 AND guidance_role IN ('head','counselor')",[$a['id']]))); }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($t['office_code']==='guide') {
+        if ((int)gq('SELECT GET_LOCK(?,10)',['guidance-write:'.DB_NAME])->fetchColumn()!==1) g_denied('Guidance is busy. Try again.',503);
+        register_shutdown_function(function(){try{gq('SELECT RELEASE_LOCK(?)',['guidance-write:'.DB_NAME]);}catch(Throwable $e){}});
+        $fresh=gone('SELECT * FROM tickets WHERE id=?',[$id]);if(!$fresh||!g_case($u,$fresh))g_denied('Ticket not found.',404);
+        $t=array_merge($t,$fresh);
+        if (($_POST['action']??'')==='assign'&&!g_head($u))g_denied('Only the Guidance head may reassign private cases.');
+    }
     $action = $_POST['action'] ?? '';
     if ($action === 'reply') {
         $msg = trim($_POST['message'] ?? '');
@@ -63,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'assign' && $isAdmin) {
         $to = (int)($_POST['assigned_to'] ?? 0);
+        if ($t['office_code']==='guide' && $to && !gone("SELECT u.id FROM users u JOIN gd_staff s ON s.user_id=u.id WHERE u.id=? AND u.office_code='guide' AND u.role='admin' AND u.status='active' AND s.active=1 AND s.guidance_role IN ('head','counselor')",[$to]))g_denied('Select an active Guidance counselor.',400);
         $ok = $to === 0 || in_array($to, array_map('intval', array_column($team, 'id')), true);     // only active admins of this office
         if (!$ok) flash('Pick someone from this office.', 'err');
         elseif ($to !== (int)$t['assigned_to']) {

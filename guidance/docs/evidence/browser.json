@@ -1,0 +1,759 @@
+{
+  "passed": 188,
+  "total": 188,
+  "errors": [],
+  "checks": [
+    {
+      "name": "overview 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "synthetic marker",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "requests 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "requests 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "requests 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "events 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "events 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "events 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "event 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "event 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "event 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "calendar 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "calendar 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "calendar 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "history 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "history 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "history 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "knowledge 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "knowledge 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "knowledge 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "settings 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "settings 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "settings 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "overview 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "requests 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "requests 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "requests 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "appointments 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "appointments 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "appointments 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "events 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "events 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "events 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "event 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "event 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "event 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "programs 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "programs 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "programs 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "calendar 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "calendar 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "calendar 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "history 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "history 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "history 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "knowledge 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "knowledge 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "knowledge 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "settings 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "settings 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "settings 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "requests 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "requests 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "requests 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "walkin 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "walkin 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "walkin 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "events 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "events 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "events 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "event 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "event 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "event 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "calendar 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "calendar 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "calendar 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "history 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "history 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "history 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "knowledge 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "knowledge 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "knowledge 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "reports 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "reports 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "reports 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "team 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "team 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "team 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "categories 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "categories 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "categories 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "privacy 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "privacy 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "privacy 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "audit 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "audit 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "audit 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "settings 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "settings 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "settings 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "overview 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "requests 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "requests 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "requests 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "walkin 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "walkin 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "walkin 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "appointments 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "appointments 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "appointments 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "events 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "events 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "events 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "event 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "event 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "event 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "programs 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "programs 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "programs 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "calendar 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "calendar 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "calendar 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "history 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "history 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "history 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "knowledge 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "knowledge 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "knowledge 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "reports 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "reports 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "reports 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "team 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "team 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "team 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "categories 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "categories 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "categories 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "audit 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "audit 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "audit 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "settings 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "settings 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "settings 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "overview 390 HTTP",
+      "passed": true
+    },
+    {
+      "name": "overview 390 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "overview 390 no broken images",
+      "passed": true
+    },
+    {
+      "name": "shared mobile menu opens",
+      "passed": true
+    },
+    {
+      "name": "student can navigate knowledge and calendar",
+      "passed": true
+    },
+    {
+      "name": "event 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "event 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "event 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "local QR SVG generated",
+      "passed": true
+    },
+    {
+      "name": "camera denial has manual fallback",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "programs 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "program save persists",
+      "passed": true
+    },
+    {
+      "name": "native shared ticket escaped XSS",
+      "passed": true
+    },
+    {
+      "name": "native shared internal note hidden",
+      "passed": true
+    },
+    {
+      "name": "shared ticket cross-user reply saved",
+      "passed": true
+    },
+    {
+      "name": "native ticket draft preserved",
+      "passed": true
+    },
+    {
+      "name": "own shared reply visible after save",
+      "passed": true
+    },
+    {
+      "name": "other-user reply visible",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 HTTP",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 no page overflow",
+      "passed": true
+    },
+    {
+      "name": "appointments 1366 no broken images",
+      "passed": true
+    },
+    {
+      "name": "module draft preserved after blur",
+      "passed": true
+    },
+    {
+      "name": "zero browser JavaScript exceptions",
+      "passed": true
+    }
+  ]
+}

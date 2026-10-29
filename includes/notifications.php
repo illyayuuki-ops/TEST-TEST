@@ -5,6 +5,7 @@
 function notif_ready(PDO $pdo): bool {
     static $ok = null;
     if ($ok !== null) return $ok;
+    try { $pdo->query('SELECT 1 FROM notifications LIMIT 1'); return $ok=true; } catch (PDOException $missing) {}
     try {
         $pdo->exec('CREATE TABLE IF NOT EXISTS notifications (
             id INT AUTO_INCREMENT PRIMARY KEY,

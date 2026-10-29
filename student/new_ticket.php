@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)$pdo->lastInsertId();
             $code = strtoupper($office['office_code']) . '-' . date('y') . '-' . str_pad((string)$id, 4, '0', STR_PAD_LEFT);
             $pdo->prepare('UPDATE tickets SET code=? WHERE id=?')->execute([$code, $id]);
+            if ($office['office_code']==='guide' && g_ready()) gq('INSERT INTO gd_case_meta(ticket_id,created_by) VALUES(?,?)',[$id,$u['id']]);
             $pdo->commit();
         } catch (Throwable $ex) {
             if ($pdo->inTransaction()) $pdo->rollBack();

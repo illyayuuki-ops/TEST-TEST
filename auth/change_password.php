@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     else {
         $pdo->prepare('UPDATE users SET password=?, must_change_password=0 WHERE id=?')->execute([password_hash($new, PASSWORD_DEFAULT), $u['id']]);
         audit('PASSWORD_CHANGED', 'Changed own password');
+        if (g_ready()) {gq('DELETE FROM gd_sessions WHERE user_id=?',[$u['id']]);$_SESSION=[];session_regenerate_id(true);redirect('auth/login.php');}
         if ($forced) { flash('Password updated. You can now use the system.'); redirect(home_for($u['role'])); }
         flash('Password updated.');
     }

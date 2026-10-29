@@ -1,0 +1,66 @@
+{
+  "passed": 15,
+  "total": 15,
+  "checks": [
+    {
+      "name": "Migration can run again",
+      "passed": true
+    },
+    {
+      "name": "Migration preserves shared accounts/tickets/memberships",
+      "passed": true
+    },
+    {
+      "name": "Synthetic setup refuses nonempty database",
+      "passed": true
+    },
+    {
+      "name": "Scheduler defaults to dry run",
+      "passed": true
+    },
+    {
+      "name": "Dry run does not change cases",
+      "passed": true
+    },
+    {
+      "name": "Scheduler applies",
+      "passed": true
+    },
+    {
+      "name": "Scheduler escalates only Guidance",
+      "passed": true
+    },
+    {
+      "name": "Scheduler rerun does not duplicate escalation",
+      "passed": true
+    },
+    {
+      "name": "Encrypted Guidance snapshot created",
+      "passed": true
+    },
+    {
+      "name": "No plaintext case or staff password in file",
+      "passed": true
+    },
+    {
+      "name": "Encrypted snapshot verifies",
+      "passed": true
+    },
+    {
+      "name": "Existing backup not overwritten",
+      "passed": true
+    },
+    {
+      "name": "Wrong encryption key rejected",
+      "passed": true
+    },
+    {
+      "name": "Backup tampering rejected",
+      "passed": true
+    },
+    {
+      "name": "Public application-root backup rejected",
+      "passed": true
+    }
+  ]
+}

@@ -13,6 +13,7 @@ function brevo_key(): string {
 
 /** Send one email. Returns true on success, false otherwise (never throws). */
 function send_mail(string $to, string $toName, string $subject, string $html): bool {
+    if (getenv('LCCT_SYNTHETIC_TEST')==='1') return false;
     if (brevo_key() === '' || MAIL_FROM === '' || !function_exists('curl_init')) return false;
     $ch = curl_init('https://api.brevo.com/v3/smtp/email');
     curl_setopt_array($ch, [
@@ -75,6 +76,7 @@ function is_school_email(string $email): bool {
 
 /** Email the person who filed a ticket (silently skipped if their address can't receive mail). */
 function notify_requester(PDO $pdo, int $ticketId, string $subject, string $messageHtml): bool {
+    if (g_ready()&&gone("SELECT id FROM tickets WHERE id=? AND office_code='guide'",[$ticketId])) {g_notice($ticketId);return false;}
     $s = $pdo->prepare('SELECT t.code, t.subject, u.id AS uid, u.email, u.full_name, o.office_name FROM tickets t JOIN users u ON u.id=t.user_id JOIN offices o ON o.office_code=t.office_code WHERE t.id=?');
     $s->execute([$ticketId]); $t = $s->fetch();
     if ($t) notif_add($pdo, (int)$t['uid'], $ticketId, $subject, $messageHtml);      // in-app bell, even when the email can't be sent
@@ -117,6 +119,7 @@ function send_staff_mail(string $email, string $name, string $subject, string $m
 
 /** Email every active admin of one office. $exceptId skips the admin who just did the action. */
 function notify_office_admins(PDO $pdo, string $officeCode, string $subject, string $messageHtml, ?int $ticketId = null, ?int $exceptId = null): void {
+    if ($officeCode==='guide') {if($ticketId&&g_ready())g_notice($ticketId);return;}
     try {
         $s = $pdo->prepare("SELECT id, email, full_name FROM users WHERE role='admin' AND status='active' AND office_code=?");
         $s->execute([$officeCode]);
@@ -130,6 +133,7 @@ function notify_office_admins(PDO $pdo, string $officeCode, string $subject, str
 
 /** Email one admin (for example the person a ticket was just assigned to). */
 function notify_admin_user(PDO $pdo, int $adminId, string $subject, string $messageHtml, ?int $ticketId = null): void {
+    if ($ticketId&&g_ready()&&gone("SELECT id FROM tickets WHERE id=? AND office_code='guide'",[$ticketId])) {g_notice($ticketId,$adminId);return;}
     try {
         $s = $pdo->prepare("SELECT email, full_name FROM users WHERE id=? AND role='admin' AND status='active'");
         $s->execute([$adminId]); $a = $s->fetch();

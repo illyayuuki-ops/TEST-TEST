@@ -1,0 +1,54 @@
+{
+  "passed": 12,
+  "total": 12,
+  "checks": [
+    {
+      "name": "Correct-base apply succeeds",
+      "passed": true
+    },
+    {
+      "name": "LF/CRLF source normalization works",
+      "passed": true
+    },
+    {
+      "name": "Private configuration preserved",
+      "passed": true
+    },
+    {
+      "name": "Environment and upload preserved",
+      "passed": true
+    },
+    {
+      "name": "Sibling original backup exists",
+      "passed": true
+    },
+    {
+      "name": "Repeated identical apply is no-op",
+      "passed": true
+    },
+    {
+      "name": "Local shared-file edits cause safe refusal",
+      "passed": true
+    },
+    {
+      "name": "Wrong source refused without edits",
+      "passed": true
+    },
+    {
+      "name": "Tampered payload refused before copying",
+      "passed": true
+    },
+    {
+      "name": "No runtime/secret/source-dump payload",
+      "passed": true
+    },
+    {
+      "name": "Local QR libraries included",
+      "passed": true
+    },
+    {
+      "name": "Word and Markdown companion included",
+      "passed": true
+    }
+  ]
+}

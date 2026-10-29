@@ -24,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fromQr      = ($_POST['qr'] ?? '') === '1';
     $pass        = (string)($_POST['password'] ?? '');
 
-    if ($f['ident'] === '' || $pass === '') {
+    if (g_ready()&&(!g_rate('login-source:'.($_SERVER['REMOTE_ADDR']??'local'),1000)||!g_rate('login:'.strtolower($f['ident']),10))) {http_response_code(429);$error='Too many attempts. Try again in 15 minutes.';}
+    if ($error!=='') {} elseif ($f['ident'] === '' || $pass === '') {
         $error = 'Enter your username (or email) and password.';
     } elseif (strpos($f['ident'], '@') !== false && !student_email_ok($f['ident'])) {
         // Typed an email: it must be studentnumber@school-domain. Anything else stops here (staff sign in with their username).
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$user) {
             $error = 'Invalid username or password.';
             audit('LOGIN_FAILED', 'Unknown account "' . $f['ident'] . '"', $actor);
-        } elseif (!in_array($user['role'], ['student', 'alumni'], true) && !($user['role'] === 'admin' && $user['office_code'] === STAFF_OFFICE)) {
+        } elseif (!in_array($user['role'], ['student', 'alumni'], true) && !g_staff_login($user)) {
             // Only students and the Student Affairs admin can sign in. Same message as a wrong password.
             $error = 'Invalid username or password.';
             audit('LOGIN_FAILED', 'Account not allowed to sign in', ['id' => $user['id'], 'username' => $user['username'], 'role' => $user['role'], 'office_code' => $user['office_code']]);
@@ -66,6 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             {
                 $pdo->prepare('UPDATE users SET failed_attempts=0, locked_until=NULL WHERE id=?')->execute([$user['id']]);
                 session_regenerate_id(true);
+                g_session_start($user);
+                if(g_ready())gq('DELETE FROM gd_rate WHERE bucket=?',[hash('sha256','login:'.strtolower($f['ident']))]);
                 $_SESSION['user'] = ['id' => (int)$user['id'], 'username' => $user['username'], 'full_name' => $user['full_name'],
                                      'role' => $user['role'], 'office_code' => $user['office_code']];
                 if ($user['role'] === 'admin') {            // detected automatically: the admin goes to the admin side
