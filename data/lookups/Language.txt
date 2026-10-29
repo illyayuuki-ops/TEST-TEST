@@ -1,0 +1,17 @@
+Bahasa;
+Chinese;
+English;
+Filipino;
+French;
+German;
+Greek;
+Hebrew;
+Italian;
+Korean;
+Latin;
+Mandarin;
+Nippongo;
+Spanish;
+Tagalog;
+Taglish;
+Vernacular;

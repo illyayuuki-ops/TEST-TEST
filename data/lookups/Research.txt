@@ -1,0 +1,8 @@
+Thesis;
+Business plan;
+Case study;
+Dissertation;
+Feasibility study
+Special problem;
+Strategic plan;
+Research project;

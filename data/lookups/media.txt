@@ -1,0 +1,10 @@
+audio;
+computer;
+microform;
+microscopic;
+projected;
+stereographic;
+unmediated;
+video;
+other;
+unspecified;

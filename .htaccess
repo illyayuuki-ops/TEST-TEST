@@ -1,0 +1,11 @@
+# Block direct web access to settings and database files (PHP still reads them normally)
+<FilesMatch "^(config|config\.local)\.php$|\.(sql|md|log|bak)$">
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order deny,allow
+  Deny from all
+</IfModule>
+</FilesMatch>
+DirectoryIndex index.php

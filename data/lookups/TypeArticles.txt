@@ -1,0 +1,18 @@
+Article;
+Book review;
+Case study;
+Commentary;
+Correspondence;
+Discussion article;
+Editorial;
+Essay;
+Featured article;
+Interview;
+Lesson plan;
+Newspaper article;
+Opinion;
+Poem;
+Research article;
+Research communication;
+Review article;
+Short story;
