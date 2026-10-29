@@ -1,4 +1,0 @@
-# Borrower photos: serve images only, never run scripts from this folder.
-<FilesMatch "\.(php|phtml|php[0-9]|phar|cgi|pl)$">
-  Require all denied
-</FilesMatch>

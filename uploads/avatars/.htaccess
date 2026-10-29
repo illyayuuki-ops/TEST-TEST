@@ -1,0 +1,8 @@
+# Profile photos are private: never served directly. They are streamed through avatar.php for the signed-in owner.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>
