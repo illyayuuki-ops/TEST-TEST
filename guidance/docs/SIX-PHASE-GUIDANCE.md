@@ -182,3 +182,37 @@ The Guidance subset export excludes password hashes and active sessions but incl
 - Production release, privacy compliance, full recovery and retirement authorization: pending.
 
 This document is a factual implementation/review record, not a signed project charter or a certification that the entire twelve-department checklist is complete.
+
+
+# Stage 1 restoration addendum — 30 October 2026
+
+The earlier phase record above remains a historical implementation record. It does not establish full TS-to-PHP parity. RESTORATION-TRACKER.md is the current comprehensive A–N gap ledger, and RESTORATION-STAGE1.md defines this source-only release.
+
+Phase 1 / Concept: Guidance-only shared architecture and source preservation remain unchanged. User authorized restoring all missing features in controlled stages, conditional on preserving the combined source.
+
+Phase 2 / Design: add query workspaces and marked GET filters; maintain per-case and per-appointment authorization independently. Reports use intake-cohort semantics and minimum-cell suppression; no inferred academic data. No database schema or shared-auth change.
+
+Phase 3 / Development: student directory, request filters/sorting/pagination/read-only board, staff metadata CSV and expanded filtered aggregate reports implemented. Existing native shell/dashboard/actions and top-right Settings location retained. Separate copy from the verified Role Sidebar baseline; no Git push/deployment.
+
+Phase 4 / Testing: 919 prior plus 341 new application checks passed (1,260 total); PHP lint and responsive/no-JS/draft/privacy checks completed on synthetic data. Installer/rollback tests are separate evidence. No school UAT, legal/privacy certification or production-load acceptance is claimed.
+
+Phase 5 / Maintenance: guarded source preflight, sibling backup and hash-checked source rollback. Academic metadata/cohorts, waitlist, staff certificate register, service/routing detail, attendance policy, staff edit/recovery, notification/resource/help discovery, audit/privacy and operations/shared recovery remain tracked, not silently dropped.
+
+Phase 6 / Retirement: unchanged. Source rollback is not database restore or authorized record deletion. Preserve all data, private configuration, uploads, old sources and backups. Shared full-system restore and any old-data import require coordinated ownership and separate review.
+
+
+# Consolidated restoration addendum — 30 October 2026
+
+This addendum supersedes the Stage 1 pending list. The current A–N tracker and CONSOLIDATED-RESTORATION.md define implementation, adaptations and shared-owner gates. No production or full-parity certification is implied.
+
+Phase 1 — Concept: deliver the remaining Guidance-scoped work in one combined release at the user’s request. Preserve the single shared identity/database/application, other departments, original source, configuration, data and backups.
+
+Phase 2 — Design: ten additive gd_plus tables, no shared-table ALTER/DROP; independent authorization for clinical and activity records; explicit academic source/verifier; Guidance-only High/targets without altering shared enum semantics; staged privacy and audit-safe exports. Whole-system recovery/common self-service auth policy remain coordinated gates.
+
+Phase 3 — Development: cohort preview/invitations, waitlist, register/individual certificates, attendance policy/provenance, service hierarchy/routing, intake attachments/preferences, review/reprioritization/reasons, staff edit/assisted reset, full notifications, resource/help discovery, keyboard palette, audit/privacy and operations/verified subset scheduling are implemented. Settings remains header-only. Source installer accepts known Role Sidebar or Stage 1 baselines and rejects unknown edits.
+
+Phase 4 — Testing: 1,673 application/operations checks passed in an isolated synthetic PHP/MariaDB/browser environment, including separate-process last-seat concurrency, all roles, aggregate privacy, upload isolation, migration-repeat/schema guards, backup tamper/key checks and responsive/keyboard/draft flows. Installer/rollback tests are separate evidence. Legacy assertions were appropriately scoped for additional forms/navigation and additive table count; screenshots were bounded to avoid synthetic fixture page-height limits. Windows Task Scheduler execution, physical camera, production load and school UAT remain unverified.
+
+Phase 5 — Maintenance: default plan-only migration, source preflight/backup/rollback, full shared-backup prerequisite and explicit opt-in scheduler. New tables are included in encrypted Guidance subset backups. Interactive Windows tasks require a logged-on user and correct private environment. No key/password is shipped or displayed, and no retention deletion is scheduled.
+
+Phase 6 — Retirement: unchanged institutional authority. Rollback restores source only and preserves new data/tables. Stop new scheduled tasks before rollback. Old source cannot display all new metadata or back it up completely. Full shared restore, historical identity/data import, common recovery policy, 2FA/hardware binding, legal retention and final retirement remain separately approved work.

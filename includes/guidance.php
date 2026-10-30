@@ -135,19 +135,20 @@ function g_nav(array $u): array
 {
     $role = g_staff($u);
     $student = is_filer($u);
-    $heading = $student ? 'Student · My work' : (['head'=>'Guidance Head · My work','counselor'=>'Counselor · My work','administrator'=>'Administrator · My work'][$role ?? ''] ?? 'Guidance');
+    $heading = $student ? 'My Guidance services' : (['head'=>'Guidance Head · My work','counselor'=>'Counselor · My work','administrator'=>'Administrator · My work'][$role ?? ''] ?? 'Guidance');
     $items = [[$heading,null,null],['Overview','guidance/index.php','fa-people-group']];
     if ($student || in_array($role, ['head','counselor'], true)) {
         $requestLabel = $student ? 'My requests' : ($role === 'head' ? 'Requests & assignments' : 'Assigned requests');
         $items[] = [$requestLabel,'guidance/index.php?view=requests','fa-ticket'];
         $items[] = [$role === 'head' ? 'All appointments' : 'My appointments','guidance/index.php?view=appointments','fa-calendar'];
     }
+    if (in_array($role, ['head','counselor'], true)) $items[] = ['Student directory','guidance/index.php?view=students','fa-address-book'];
     if ($role === 'administrator') {
         // This role's primary work is the existing activity operations page.
         // Do not duplicate its Activities link inside the shared group.
         $items[] = ['Activity operations','guidance/index.php?view=events','fa-calendar-days'];
     }
-    if ($student) $items[] = ['Certificates & credits','guidance/index.php?view=history','fa-award'];
+    if ($student) $items[] = ['My certificates & credits','guidance/index.php?view=history','fa-award'];
     if ($role === 'head') {
         $items[] = ['Privacy reviews','guidance/index.php?view=privacy','fa-shield-halved'];
         $items[] = ['Guidance audit','guidance/index.php?view=audit','fa-clipboard-list'];
@@ -159,8 +160,14 @@ function g_nav(array $u): array
     if (!$student) $shared[] = ['Certificates & credits','guidance/index.php?view=history','fa-award'];
     $shared[] = ['Resources','guidance/index.php?view=knowledge','fa-book-open'];
     if ($role) $shared[] = ['Aggregate reports','guidance/index.php?view=reports','fa-chart-column'];
+    if (gr_ready()) {
+        $shared[] = ['Notifications','guidance/index.php?view=notifications','fa-bell'];
+        $shared[] = ['Help & services','guidance/index.php?view=help','fa-circle-question'];
+        if ($role) $shared[] = ['Certificate register','guidance/index.php?view=register','fa-award'];
+        if ($role === 'head') $shared[] = ['Guidance operations','guidance/index.php?view=operations','fa-gears'];
+    }
     // A fourth array element represents a collapsible group, not another route.
-    $items[] = ['Shared Guidance tools',null,'fa-layer-group',$shared];
+    $items[] = [$student ? 'Activities & resources' : 'Shared Guidance tools',null,'fa-layer-group',$shared];
     return $items;
 }
 function g_signature(array $u): string
@@ -184,6 +191,8 @@ function g_signature(array $u): string
         'preferences' => gone('SELECT ticket_updates FROM gd_preferences WHERE user_id=?',[$uid]),
         'team' => gall("SELECT u.id,u.full_name,u.status,s.guidance_role,s.active FROM users u JOIN gd_staff s ON s.user_id=u.id WHERE u.office_code='guide'".($role === 'head' ? '' : " AND u.role='admin' AND u.status='active' AND s.active=1 AND s.guidance_role IN ('head','counselor')").' ORDER BY u.id')
     ];
+    if (gr_ready()) $data['restoration_revision'] = gone("SELECT setting_value FROM gd_settings WHERE setting_key='plus_revision'");
+    if (gr_ready() && $role==='head') $data['operations'] = gall("SELECT setting_key,setting_value FROM gd_settings WHERE setting_key IN ('last_job','last_plus_backup') ORDER BY setting_key");
     return hash('sha256',json_encode($data));
 }
 
@@ -194,3 +203,5 @@ function g_rate(string $key, int $limit, int $seconds = 900): bool
     gq('INSERT INTO gd_rate(bucket,attempts,expires_at) VALUES(?,1,?) ON DUPLICATE KEY UPDATE attempts=IF(expires_at>NOW(),attempts+1,1),expires_at=IF(expires_at>NOW(),expires_at,VALUES(expires_at))',[$bucket,$until]);
     return (int)gq('SELECT attempts FROM gd_rate WHERE bucket=?',[$bucket])->fetchColumn() <= $limit;
 }
+
+require_once dirname(__DIR__).'/guidance/restoration.php';

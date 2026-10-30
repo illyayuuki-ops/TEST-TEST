@@ -1,4 +1,8 @@
+> **Consolidated release update — 30 October 2026:** This is a historical patch/inventory record. The current feature status is `RESTORATION-TRACKER.md`; use `CONSOLIDATED-RESTORATION.md` for the combined installation and migration.
+
 # Old Guidance feature inventory and transfer ledger
+
+**30 October 2026 update:** This earlier inventory was incomplete. The comprehensive audit and current `RESTORATION-TRACKER.md` govern remaining gaps. Stage 1 restores the core directory/queue/report workspaces, not full parity; see `RESTORATION-STAGE1.md`.
 
 Reviewed against the preserved React/TypeScript/Express/SQLite source, especially `server/index.ts`, `server/engine.ts`, `server/database.ts`, `server/archive-tool.ts`, and the earlier PHP reference. The Library-based payload is **not** used as an installable foundation. Old test counts do not certify this new build. Old SQLite records were not imported.
 
@@ -13,13 +17,13 @@ Status definitions: **Connected** = implemented against corrected shared records
 | Device binding and 2FA | Deferred | No hardware binding or 2FA; eight-hour server sessions are not a substitute |
 | Own sessions / sign out all | Connected | Shared session revocation, cookie replay checks |
 | Requests, replies, internal notes, attachments | Connected | Same `tickets`, `replies`, `ticket_files`; authorization on ticket/live/file routes |
-| Walk-in intake | Connected | Selected student remains owner; creator recorded separately |
+| Walk-in intake | Partial | Selected student remains owner; creator recorded separately; initial walk-in attachments remain pending |
 | Assignment / reassignment | Adapted | Head-only reassignment; currently assigned counselor scope |
 | Ticket lifecycle, reopen, closure | Adapted | Native statuses; validated Guidance transitions; no automatic no-reply closure for Guidance |
 | Priority / SLA / escalation | Partial | Native Low/Normal/Urgent targets, manual escalation, scheduled Guidance-only overdue escalation; no High priority or configurable per-Guidance target editor |
-| Categories and knowledge | Connected | Shared Guidance categories; draft/published resources |
+| Categories and knowledge | Partial | Shared basic Guidance categories and draft/published resources; descriptions/hierarchy/SLA editing and richer resource search remain pending |
 | Updates and notifications | Adapted | Shared bell; generic in-app case notices, preferences, draft-safe refresh; no external clinical-case emails |
-| Search / filtering | Partial | Basic request search and native portal filtering; not all old advanced filters |
+| Search / filtering | Adapted | Stage 1 scoped server filters/sorting/pagination, list/board and staff metadata CSV; shared current priorities retained |
 | Appointments and calendar | Connected | Future booking, conflict checks, counselor/head status handling; chronological calendar, not drag-and-drop scheduling |
 | Guidance activity types | Connected | Seminar, workshop, assembly, orientation, testing, career fair, recollection, wellbeing and other |
 | Recurring programs | Partial | Grouped manually authored sessions; no automatic recurrence generator |
@@ -30,7 +34,7 @@ Status definitions: **Connected** = implemented against corrected shared records
 | Certificates and credits | Adapted | Authenticated printable certificate, snapshot, idempotent issuance; no public verification, correction or revocation workflow |
 | Event deletion | Adapted | Cancel instead of destructively deleting participation history |
 | Student participation history | Connected | Invitations, RSVP, attendance, earned credits and certificate access |
-| Aggregate counselor/admin analytics | Partial | Status, priority, attendance, overdue counts, suppressed response/resolution averages and CSV; no full old advanced chart/filter suite |
+| Aggregate counselor/admin analytics | Adapted | Stage 1 intake-date/service/counselor filters and suppressed workload/backlog/trend/response/resolution/satisfaction/participation charts and CSV; school definitions and academic cohort integration still pending |
 | Audit and rate limits | Connected | Scoped/redacted action audit, persistent limits, shared actor IDs; not a completed independent security audit |
 | Privacy/export/review | Adapted | Own-record JSON excludes internal notes/file bytes; review-only erasure requests; no automatic clinical deletion |
 | Encrypted backups / integrity checks | Partial | CLI authenticated encrypted Guidance subset including files; no web operations console or automatic backup schedule installation |

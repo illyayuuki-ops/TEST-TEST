@@ -82,6 +82,7 @@ function g_save(string $table, int $id, array $values): int
 function g_action(array $u, string $action, array $p): array
 {
     global $pdo;
+    if (str_starts_with($action, 'x.')) return gr_action($u,$action,$p);
     $uid = (int)$u['id'];
     $id = gi($p, 'id');
     $staff = g_staff($u);
@@ -124,7 +125,7 @@ function g_action(array $u, string $action, array $p): array
             gx(!gone("SELECT id FROM gd_appointments WHERE status IN ('requested','confirmed') AND (counselor_id=? OR user_id=?) AND starts_at<? AND ends_at>?", [$to,$uid,$end,$start]), 'This time overlaps an appointment.', 409);
             gq('INSERT INTO gd_appointments(user_id,counselor_id,starts_at,ends_at,concern,updated_at) VALUES(?,?,?,?,?,NOW())', [$uid,$to,$start,$end,gt($p, 'concern', 5, 4000)]);
             $id = (int)$pdo->lastInsertId();
-            notif_add($pdo, $to, null, 'Guidance appointment requested', 'Review your appointment schedule.');
+            if (gr_ready()) gr_notice($to,'Guidance appointment requested','appointments'); else notif_add($pdo, $to, null, 'Guidance appointment requested', 'Review your appointment schedule.');
             $next .= '?view=appointments';
             break;
         case 'appointment.update':
@@ -137,7 +138,7 @@ function g_action(array $u, string $action, array $p): array
             if ($st === 'completed') {
                 gx($a['starts_at'] <= date('Y-m-d H:i:s'), 'Cannot complete a future appointment.', 409);
             }gq('UPDATE gd_appointments SET status=?,updated_at=NOW() WHERE id=?', [$st,$id]);
-            notif_add($pdo, (int)$a['user_id'], null, 'Appointment updated', 'Open Guidance appointments for the current status.');
+            if (gr_ready()) gr_notice((int)$a['user_id'],'Guidance appointment updated','appointments'); else notif_add($pdo, (int)$a['user_id'], null, 'Appointment updated', 'Open Guidance appointments for the current status.');
             $next .= '?view=appointments';
             break;
         case 'program.save':
@@ -186,7 +187,7 @@ function g_action(array $u, string $action, array $p): array
                 if (gone('SELECT id FROM gd_invites WHERE event_id=? AND user_id=?', [$id,$student])) {
                     continue;
                 }gq('INSERT INTO gd_invites(event_id,user_id,pass_code) VALUES(?,?,?)', [$id,$student,bin2hex(random_bytes(24))]);
-                notif_add($pdo, $student, null, 'Guidance invitation: '.$e['title'], 'Open Guidance activities to accept or decline.');
+                if (gr_ready()) gr_notice($student,'Guidance activity invitation','event',$id); else notif_add($pdo, $student, null, 'Guidance invitation: '.$e['title'], 'Open Guidance activities to accept or decline.');
                 $n++;
             }$msg = "$n invitation(s) sent.";
             $next .= '?view=event&id='.$id;
@@ -326,6 +327,7 @@ function g_action(array $u, string $action, array $p): array
         ];
         $msg = $messages[$action] ?? $msg;
     }
+    gr_after($u,$action,$p,isset($i)&&is_array($i)&&isset($i['event_id'])?$i:null);
     g_audit($u, $action, (string)$id);
     return ['message' => $msg,'redirect' => url($next),'id' => $id];
 }

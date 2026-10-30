@@ -78,3 +78,6 @@
 #guidance .gd-overview .tk-title, #guidance .gd-overview .tk-sub { overflow-wrap: anywhere; }
 #guidance .gd-overview > *, #guidance .gd-overview .tk-card { min-width: 0; }
 @media(max-width:700px) { #guidance .gd-overview .filters input, #guidance .gd-overview .filters select { width: 100%; flex-basis: 100%; } }
+
+/* Guidance-only High priority; shared department priorities are unchanged. */
+#guidance .pr-high{background:#fff4d4;color:#754d00;border-color:#e8c56d}

@@ -53,7 +53,6 @@ function ticket_tracker(array $t, bool $full = false): string {
 }
 
 function nav_for(array $u): array {
-    if(is_filer($u)&&(str_contains(str_replace('\\','/',$_SERVER['SCRIPT_NAME']??''),'/guidance/')||defined('GD_PASSWORD_PAGE'))) return array_merge(g_nav($u),[['Shared portal',null,null],['All my tickets','student/dashboard.php','fa-ticket'],['New ticket','student/new_ticket.php','fa-plus']]);
     if ($u['role']==='admin' && ($u['office_code']??'')==='guide') return g_nav($u);
     if ($u['role'] === 'admin') {
         $nav = [
@@ -73,6 +72,9 @@ function nav_for(array $u): array {
         ['My Tickets', 'student/dashboard.php', 'fa-ticket'],
         ['Ticket History', 'student/history.php', 'fa-clock-rotate-left'],
         ['New Ticket', 'student/new_ticket.php', 'fa-plus'],
+        ['Account', null, null],
+        ['Profile', 'student/profile.php', 'fa-id-badge'],
+        ['Password', 'auth/change_password.php', 'fa-key'],
         ['Guidance Office', null, null],
         ['Guidance services','guidance/index.php','fa-people-group'],
     ];
@@ -92,7 +94,9 @@ function dash_hero(string $eyebrow, string $title, string $text, ?string $lastTs
 
 /** Guidance uses query-string views; leave other shared routes' matching unchanged. */
 function nav_is_active(string $currentPath, string $href): bool {
-    // Account subpages live under a single Settings entry, not separate sidebar items.
+    // Students keep the original campus sidebar on every Guidance page.
+    if (is_filer($_SESSION['user']) && $currentPath === 'guidance/index.php' && $href === 'guidance/index.php') return true;
+    // Staff account subpages live under a single Settings entry.
     if ($href === 'student/settings.php' && in_array($currentPath, ['student/profile.php','auth/change_password.php'], true)) return true;
     if ($href === 'guidance/index.php?view=settings' && $currentPath === 'auth/change_password.php') return true;
     if ($currentPath !== 'guidance/index.php' || parse_url($href, PHP_URL_PATH) !== 'guidance/index.php') {
@@ -100,7 +104,7 @@ function nav_is_active(string $currentPath, string $href): bool {
     }
     parse_str((string)(parse_url($href, PHP_URL_QUERY) ?? ''), $linkQuery);
     $view = (string)($_GET['view'] ?? 'overview');
-    $view = ['event' => 'events', 'walkin' => 'requests', 'team' => 'settings', 'categories' => 'settings'][$view] ?? $view;
+    $view = ['event' => 'events', 'walkin' => 'requests', 'intake'=>'requests', 'review'=>'requests', 'cohort'=>'events', 'team' => 'settings', 'categories' => 'settings'][$view] ?? $view;
     return ($linkQuery['view'] ?? 'overview') === $view;
 }
 
@@ -176,10 +180,18 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
     <?php if ($accountMenu): ?><div class="tb-user" id="tbUser">
       <button type="button" class="who" id="tbBtn" aria-haspopup="true" aria-expanded="false" title="Account"><?= avatar_html($u['full_name'], $avatar, 40) ?><span class="nm"><?= e($u['full_name']) ?><small><?= $roleLabel ?></small></span><i class="fa-solid fa-chevron-down chev"></i></button>
       <div class="tb-menu" id="tbMenu" role="menu">
+        <?php if (is_filer($u)): ?>
+        <a class="tb-head" href="<?= url('student/profile.php') ?>"><?= avatar_html($u['full_name'], $avatar, 46) ?><span><b><?= e($u['full_name']) ?></b><small>See your profile</small></span></a>
+        <div class="tb-sep"></div>
+        <a role="menuitem" href="<?= url('student/profile.php') ?>"><i class="fa-solid fa-user"></i>My profile</a>
+        <a role="menuitem" href="<?= url('auth/change_password.php') ?>"><i class="fa-solid fa-key"></i>Change password</a>
+        <div class="tb-sep"></div>
+        <?php else: ?>
         <a class="tb-head" href="<?= e(url($settingsHref)) ?>"><?= avatar_html($u['full_name'], $avatar, 46) ?><span><b><?= e($u['full_name']) ?></b><small>Account settings</small></span></a>
         <div class="tb-sep"></div>
         <a role="menuitem" href="<?= e(url($settingsHref)) ?>"><i class="fa-solid fa-gear"></i>Settings</a>
         <div class="tb-sep"></div>
+        <?php endif; ?>
         <a role="menuitem" class="tb-out" href="<?= url('auth/logout.php') ?>"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a>
       </div>
     </div><?php endif; ?>

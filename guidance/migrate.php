@@ -18,20 +18,30 @@ foreach (['users' => ['id','username','password','role','office_code','verificat
 if (!gone("SELECT office_code FROM offices WHERE office_code='guide'")) {
     throw new RuntimeException('The shared Guidance office code guide must exist. Do not rename another office.');
 }
-foreach (preg_split('/;\s*(?:\r?\n|$)/', file_get_contents(__DIR__.'/migrations/001_guidance.sql')) as $q) {
-    if (trim($q) !== '') {
-        $pdo->exec($q);
-    }
-}
-notif_ready($pdo);
-gq("INSERT IGNORE INTO gd_case_meta(ticket_id,created_by) SELECT id,NULL FROM tickets WHERE office_code='guide'");
+require_once __DIR__.'/migration-check.php';
+$plan = gm_plan($pdo, __DIR__.'/migrations/001_guidance.sql');
+$headAccount = null;
 $at = array_search('--grant-head', $argv, true);
 if ($at !== false) {
     $username = $argv[$at + 1] ?? '';
-    $a = gone("SELECT id FROM users WHERE username=? AND role='admin' AND office_code='guide' AND status='active'", [$username]);
-    if (!$a) {
-        throw new RuntimeException('Head must be an existing active shared admin with office_code guide.');
-    }gq("INSERT INTO gd_staff(user_id,guidance_role,active) VALUES(?,'head',1) ON DUPLICATE KEY UPDATE guidance_role='head',active=1", [$a['id']]);
+    $headAccount = gone("SELECT id FROM users WHERE username=? AND role='admin' AND office_code='guide' AND status='active'", [$username]);
+    if (!$headAccount) throw new RuntimeException('Head must be an existing active shared admin with office_code guide. No migration was applied.');
 }
-gq("INSERT INTO gd_settings(setting_key,setting_value) VALUES('schema','2') ON DUPLICATE KEY UPDATE setting_value='2'");
-echo "Installed Guidance extension. Shared users, tickets, replies, categories and files were not replaced.\nExisting sessions require one new sign-in after first installation.\n";
+if (!in_array('--apply', $argv, true)) {
+    echo "PLAN ONLY: Guidance base schema checked. No database changes made.\n";
+    foreach ($plan as $item) echo $item['table'].($item['exists'] ? " : existing, verified\n" : " : would create\n");
+    if ($headAccount) echo "Would grant Guidance head to the specified existing account.\n";
+    echo "Back up the shared database and uploads first. Apply explicitly with --apply only after coordinator approval.\n";
+    return;
+}
+if ((int)gq('SELECT GET_LOCK(?,10)', ['guidance-write:'.DB_NAME])->fetchColumn() !== 1) throw new RuntimeException('Guidance is busy. No migration applied.');
+try {
+    // Recheck after acquiring the lock; refuse unexpected existing schemas.
+    $plan = gm_plan($pdo, __DIR__.'/migrations/001_guidance.sql');
+    foreach ($plan as $item) $pdo->exec($item['sql']);
+    notif_ready($pdo);
+    gq("INSERT IGNORE INTO gd_case_meta(ticket_id,created_by) SELECT id,NULL FROM tickets WHERE office_code='guide'");
+    if ($headAccount) gq("INSERT INTO gd_staff(user_id,guidance_role,active) VALUES(?,'head',1) ON DUPLICATE KEY UPDATE guidance_role='head',active=1", [$headAccount['id']]);
+    gq("INSERT INTO gd_settings(setting_key,setting_value) VALUES('schema','2') ON DUPLICATE KEY UPDATE setting_value='2'");
+    echo "Installed Guidance extension. Existing shared records preserved.\nFirst installation requires a new sign-in. MySQL DDL is not transactional; keep backups and stop on any error.\n";
+} finally { gq('SELECT RELEASE_LOCK(?)', ['guidance-write:'.DB_NAME]); }

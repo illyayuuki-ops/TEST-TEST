@@ -33,6 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (($_POST['action']??'')==='assign'&&!g_head($u))g_denied('Only the Guidance head may reassign private cases.');
     }
     $action = $_POST['action'] ?? '';
+    if ($t['office_code']==='guide' && gr_ready() && ($action==='cancel' || ($action==='status' && in_array($_POST['status']??'', ['Escalated','Cancelled'],true)))) {
+        require_once __DIR__.'/guidance/domain.php';
+        try { $result=g_transaction(fn()=>gr_action($u,'x.case.transition',['id'=>$id,'status'=>$action==='cancel'?'Cancelled':$_POST['status'],'reason'=>$_POST['reason']??''])); flash($result['message']); }
+        catch (Throwable $ex) { flash($ex instanceof RuntimeException && !($ex instanceof PDOException) ? $ex->getMessage() : 'Unable to update this request.','err'); }
+        redirect('ticket.php?id='.$id);
+    }
+
     if ($action === 'reply') {
         $msg = trim($_POST['message'] ?? '');
         $internal = $isAdmin && !empty($_POST['internal']);      // private note between office staff; the requester never sees it
@@ -84,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'status' && $isAdmin) {
         $ns = $_POST['status'] ?? '';
-        if (change_ticket_status($pdo, $t, $ns)) flash("Status changed to $ns. The requester was emailed.");
+        if (change_ticket_status($pdo, $t, $ns)) flash($t['office_code']==='guide'?"Status changed to $ns. Guidance uses in-app updates; no clinical email was sent.":"Status changed to $ns. The requester was emailed.");
     } elseif ($action === 'reopen' && !$isAdmin) {
         if (can_reopen($t)) {
             change_ticket_status($pdo, $t, 'Reopened', null, false);
@@ -136,6 +143,7 @@ $evText = function (array $e) use ($t) {
 };
 
 page_start($t['subject'], e($t['code']) . ' · ' . e($t['category']), '<a class="btn" href="' . url($back) . '"><i class="fa-solid fa-arrow-left"></i>Back</a>');
+if ($t['office_code']==='guide' && gr_ready()) { $guidePolicy=gr_enrich($t); echo '<div class="alert">Guidance priority: '.e($guidePolicy['priority']).' · Guidance target: '.e($guidePolicy['sla_hours']).' hours. <a href="'.e(url('guidance/index.php?view=review&id='.$id)).'">Review, preferences and reasons</a>. Shared fields below retain the common policy.</div>'; }
 ?>
 <div class="card"><?= ticket_tracker($t, true) ?></div>
 <div class="two-col">
@@ -201,7 +209,7 @@ page_start($t['subject'], e($t['code']) . ' · ' . e($t['category']), '<a class=
       <?php if (!$events): ?><div class="mono" style="font-size:12px">No activity yet.</div><?php endif; ?>
     </div>
     <?php if (!$isAdmin && in_array($t['status'], ['Open', 'Reopened'], true)): ?>
-    <div class="card"><form method="post" onsubmit="return confirm('Cancel this ticket?')"><?= csrf_field() ?><input type="hidden" name="action" value="cancel">
+    <div class="card"><form method="post" onsubmit="return confirm('Cancel this ticket?')"><?= csrf_field() ?><input type="hidden" name="action" value="cancel"><?php if ($t['office_code']==='guide' && gr_ready()): ?><label class="field">Cancellation reason<textarea name="reason" minlength="5" maxlength="2000" required></textarea></label><?php endif; ?>
       <button class="btn btn-danger" type="submit" style="width:100%"><i class="fa-solid fa-ban"></i>Cancel ticket</button><div class="hint">Only until the office starts working on it.</div></form></div>
     <?php endif; ?>
     <?php if ($isAdmin): ?>
@@ -214,7 +222,7 @@ page_start($t['subject'], e($t['code']) . ' · ' . e($t['category']), '<a class=
     </div>
     <div class="card">
       <div class="card-h"><h3>Update status</h3></div>
-      <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="status">
+      <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="status"><?php if ($t['office_code']==='guide' && gr_ready()): ?><label class="field">Reason (required for escalation or cancellation)<textarea name="reason" minlength="5" maxlength="2000"></textarea></label><?php endif; ?>
         <div class="field"><select name="status"><?php foreach (STATUSES as $s): ?><option <?= $t['status'] === $s ? 'selected' : '' ?>><?= $s ?></option><?php endforeach; ?></select></div>
         <button class="btn" type="submit" style="width:100%">Save status</button>
       </form>

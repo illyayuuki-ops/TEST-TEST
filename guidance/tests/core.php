@@ -25,7 +25,7 @@ function bad(string $name, callable $f, int $code = 400): void
 }
 try {
     tc('Shared Guidance readiness marker', g_ready());
-    tc('Exactly 14 gd tables', (int)gq("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME LIKE 'gd\\_%'")->fetchColumn() === 14);
+    tc('Expected base plus additive gd tables', (int)gq("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME LIKE 'gd\\_%'")->fetchColumn() === (gr_ready()?24:14));
     $h = gone("SELECT * FROM users WHERE username='guide_head'");
     $c = gone("SELECT * FROM users WHERE username='guide_counselor'");
     $a = gone("SELECT * FROM users WHERE username='guide_admin'");

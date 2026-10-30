@@ -7,12 +7,13 @@ if (PHP_SAPI !== 'cli') {
 }
 require dirname(__DIR__).'/config/app.php';
 require __DIR__.'/domain.php';
+require __DIR__.'/workbench.php';
 if (!g_ready()) {
     throw new RuntimeException('Install Guidance first.');
 }
 $apply = in_array('--apply', $argv, true);
 $result = g_transaction(function () use ($apply) {
-    $due = gall("SELECT t.id FROM tickets t WHERE t.office_code='guide' AND t.status IN ('Open','Reopened','In Progress') AND ".sla_overdue_sql('t').' ORDER BY t.id LIMIT 500');
+    $due = gr_ready() ? array_slice(array_values(array_filter(array_map('gr_enrich',gall("SELECT t.* FROM tickets t WHERE t.office_code='guide' AND t.status IN ('Open','Reopened','In Progress') ORDER BY t.id")),fn($t)=>gw_due($t)<=time())),0,500) : gall("SELECT t.id FROM tickets t WHERE t.office_code='guide' AND t.status IN ('Open','Reopened','In Progress') AND ".sla_overdue_sql('t').' ORDER BY t.id LIMIT 500');
     $sessions = (int)gq('SELECT COUNT(*) FROM gd_sessions WHERE expires_at<=NOW()')->fetchColumn();
     $rates = (int)gq('SELECT COUNT(*) FROM gd_rate WHERE expires_at<=NOW()')->fetchColumn();
     if ($apply) {
@@ -24,6 +25,6 @@ $result = g_transaction(function () use ($apply) {
         gq('DELETE FROM gd_rate WHERE expires_at<=NOW()');
         gq("INSERT INTO gd_settings(setting_key,setting_value) VALUES('last_job',?) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)", [date(DATE_ATOM)]);
     }
-    return ['dry_run' => !$apply,'guidance_overdue_to_escalate' => count($due),'expired_session_rows' => $sessions,'expired_rate_rows' => $rates,'note' => 'Uses shared 24/72/120-hour priority targets. No clinical records or other-office tickets are deleted or altered.'];
+    return ['dry_run' => !$apply,'guidance_overdue_to_escalate' => count($due),'expired_session_rows' => $sessions,'expired_rate_rows' => $rates,'note' => 'Uses Guidance-specific targets when configured; shared defaults otherwise. No clinical records or other-office tickets are deleted or altered.'];
 });
 echo json_encode($result, JSON_PRETTY_PRINT).PHP_EOL;

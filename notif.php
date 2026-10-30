@@ -12,6 +12,10 @@ if (isset($_GET['go'])) {                                   // click on a notifi
         $s = $pdo->prepare('SELECT ticket_id FROM notifications WHERE id=? AND user_id=?'); $s->execute([$id, $uid]); $tid = (int)$s->fetchColumn();
         $pdo->prepare('UPDATE notifications SET read_at=COALESCE(read_at,NOW()) WHERE id=? AND user_id=?')->execute([$id, $uid]);
     } catch (Throwable $e) { error_log('notif go: ' . $e->getMessage()); }
+    if (gr_ready()) {
+        $deep=gone('SELECT l.view_name,l.record_id FROM gd_plus_notices l JOIN notifications n ON n.id=l.notification_id WHERE n.id=? AND n.user_id=?',[$id,$uid]);
+        if ($deep && in_array($deep['view_name'],['event','appointments','history','settings','requests'],true)) redirect('guidance/index.php?view='.$deep['view_name'].((int)$deep['record_id']?'&id='.(int)$deep['record_id']:''));
+    }
     redirect($tid ? 'ticket.php?id=' . $tid : home_for($u['role']));
 }
 

@@ -1,0 +1,135 @@
+/* Guidance layout correction. No shared campus selectors, colors or theme overrides. */
+#guidance { overflow-wrap: anywhere; }
+#guidance .gd-grid { grid-template-columns: repeat(auto-fit,minmax(min(100%,340px),1fr)); margin-bottom:20px; }
+#guidance .gd-grid.gd-three { grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); }
+#guidance .gd-grid > .gd-card { margin-bottom:0; height:100%; }
+#guidance .gd-grid > div > .gd-card:last-child { margin-bottom:0; }
+#guidance .gu-card-body { display:flow-root; min-width:0; }
+#guidance .gu-card-body > :first-child { margin-top:0; }
+#guidance .gu-card-body > :last-child { margin-bottom:0; }
+#guidance .gd-card .card-h { align-items:flex-start; }
+#guidance .gd-card .card-h h3 { line-height:1.35; }
+#guidance .gd-card p, #guidance .gd-cell { line-height:1.6; }
+#guidance .gd-card dl { grid-template-columns:minmax(110px,.7fr) minmax(0,1.6fr); align-items:start; }
+#guidance .gd-card dd { text-align:left; margin:0; line-height:1.55; }
+#guidance .gd-card dt { font-weight:600; line-height:1.55; }
+#guidance .gd-card .gu-card-body > dl:first-child { border-top:0; margin-top:0; padding-top:0; }
+#guidance .gd-buttons { align-items:center; }
+#guidance .btn { line-height:1.4; text-align:center; min-height:44px; }
+#guidance .badge { white-space:normal; line-height:1.4; overflow-wrap:anywhere; }
+#guidance .gd-tablewrap th { text-align:left; vertical-align:top; white-space:normal; }
+#guidance .gd-tablewrap td { text-align:left; vertical-align:top; }
+#guidance .gd-tablewrap .gd-cell > :last-child { margin-bottom:0; }
+#guidance .gd-cell .gd-form { margin-top:10px; container-type:normal; }
+#guidance .gd-cell > .gd-form:first-child { margin-top:0; }
+#guidance .gd-tablewrap { margin-top:16px; }
+#guidance .gu-card-body > .gd-tablewrap:first-child { margin-top:0; }
+/* Keep labels and controls together; align neighboring inputs along their bottom edge. */
+#guidance .gd-form { container-type:inline-size; container-name:guidance-form; gap:14px; }
+#guidance .gu-form-body, #guidance .gd-fields, #guidance .gw-filters .gd-fields {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:end; min-width:0;
+}
+#guidance .gu-form-body > *, #guidance .gd-fields > * { min-width:0; margin-bottom:0; }
+#guidance .gu-form-body > div, #guidance .gu-form-body > p, #guidance .gu-form-body > fieldset,
+#guidance .gu-form-body > .gd-check, #guidance .gu-form-body > .gd-password-field,
+#guidance .gu-form-body > label:has(textarea), #guidance .gu-form-body > label:has(select[multiple]) { grid-column:1/-1; }
+#guidance .gu-form-body:has(> input[type=hidden]):not(:has(> :not(input[type=hidden]))) { display:none; }
+#guidance .gd-fields > label:has(textarea), #guidance .gd-fields > label:has([name=subject]), #guidance .gu-form-body > label:has([name=subject]) { grid-column:1/-1; }
+#guidance .gu-form-body > input[type=hidden] { display:none; }
+#guidance .gd-form > button { margin:0; }
+#guidance label.field { margin-bottom:0; text-align:left; line-height:1.45; }
+#guidance label.field > .lbl { line-height:1.45; margin-bottom:6px; }
+#guidance label.field input, #guidance label.field select, #guidance label.field textarea { width:100%; min-width:0; max-width:100%; }
+#guidance .gd-check { align-items:flex-start; line-height:1.5; text-align:left; }
+#guidance .gd-check input { margin-top:2px; }
+#guidance .gu-form-body > .gd-note { margin:0; }
+#guidance .gu-fieldset .gd-note { margin:16px 0 0; }
+#guidance .gu-fieldset { border:1px solid var(--line); border-radius:12px; padding:14px; }
+#guidance .gu-fieldset > :last-child { margin-bottom:0; }
+#guidance .gu-fieldset legend { font-size:13px; font-weight:700; color:var(--navy); padding:0 6px; }
+#guidance .gd-card details { border-top:1px solid var(--line); padding-top:14px; margin-top:16px; min-width:0; }
+#guidance .gd-card summary { line-height:1.5; margin-bottom:0; padding:5px 0; }
+#guidance .gd-card details[open] > summary { margin-bottom:12px; }
+#guidance .gd-card summary:focus-visible, #guidance .gu-jumps a:focus-visible { outline:3px solid var(--blue); outline-offset:4px; border-radius:4px; }
+#guidance .gd-card details > .gd-form { margin-top:0; }
+#guidance .gu-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
+#guidance .gu-pair > * { min-width:0; }
+#guidance .gu-record-meta { display:flex; align-items:center; flex-wrap:wrap; gap:8px 14px; margin-bottom:14px; font-size:13px; color:var(--text-2); }
+#guidance .gu-record-meta strong { color:var(--navy); font-size:16px; }
+#guidance .gu-subsection { border-top:1px solid var(--line); padding-top:16px; margin-top:20px; }
+#guidance .gu-subsection dl { border:0; padding-top:0; margin-top:12px; }
+#guidance .gu-subsection h4 { font-size:15px; color:var(--navy); margin-bottom:10px; }
+#guidance .gu-desk-panel { border:0; margin:0; padding:0; }
+#guidance .gu-sensitive > details > summary { color:var(--red); }
+#guidance .gu-intro { color:var(--text-2); max-width:80ch; line-height:1.6; margin-bottom:20px; }
+#guidance .gu-group { margin-top:30px; scroll-margin-top:20px; }
+#guidance .gu-group-head { margin-bottom:16px; }
+#guidance .gu-group-head h2 { color:var(--navy); font:600 23px/1.35 var(--font-display); margin-bottom:6px; }
+#guidance .gu-group-head p { color:var(--text-2); font-size:14px; line-height:1.55; max-width:80ch; }
+#guidance .gu-group > :last-child { margin-bottom:0; }
+#guidance .gu-jumps { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; border-block:1px solid var(--line); padding:12px 0; margin:6px 0 24px; font-size:13px; }
+#guidance .gu-jumps span { color:var(--text-2); font-weight:700; }
+#guidance .gu-jumps a { color:var(--deep); text-decoration:underline; text-underline-offset:4px; padding:6px 0; }
+/* GET filters remain server-rendered and usable without JavaScript. */
+#guidance form[data-gfilter] { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr)); gap:14px; align-items:end; margin-block:16px; }
+#guidance form[data-gfilter] > .gd-fields, #guidance form[data-gfilter] > .gd-buttons,
+#guidance form[data-gfilter] > details, #guidance form[data-gfilter] > button { grid-column:1/-1; }
+#guidance form[data-gfilter] > button { justify-self:start; }
+#guidance form[data-gfilter] > .gd-buttons { margin:0; }
+#guidance form[data-gfilter] > details { margin-top:0; }
+#guidance .gw-pagination, #guidance nav[aria-label="Result pages"] { margin-top:18px; }
+#guidance .gw-reports td:last-child strong { display:block; text-align:right; font-variant-numeric:tabular-nums; }
+#guidance .gw-reports th:last-child { text-align:right; }
+/* The native reset removes the dialog's UA auto margins. Explicitly center it. */
+#gr-command { inset:0; margin:auto; width:min(600px,calc(100vw - 32px)); max-width:calc(100vw - 32px); max-height:80vh; max-height:80dvh; overflow:auto; padding:24px; border:1px solid var(--line); border-radius:var(--radius); color:var(--text); background:var(--surface); box-shadow:var(--shadow); }
+#gr-command[open] { display:flex; flex-direction:column; }
+#gr-command .gu-command-head { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-shrink:0; }
+#gr-command .gu-command-head h2 { margin:0; }
+#gr-command .gu-command-head button { flex-shrink:0; }
+#gr-command > label { flex-shrink:0; }
+#gr-command::backdrop { background:rgba(27,51,85,.6); backdrop-filter:blur(3px); }
+#gr-command h2 { font:600 23px/1.35 var(--font-display); color:var(--navy); margin-bottom:18px; }
+#gr-command label { display:block; color:var(--navy); font-size:13px; font-weight:700; }
+#gr-command input { display:block; width:100%; min-width:0; margin-top:6px; }
+#gr-command nav { display:grid; gap:8px; margin:16px 0 0; overflow:auto; min-height:0; overscroll-behavior:contain; padding:4px; }
+#gr-command nav .btn { justify-content:flex-start; text-align:left; min-height:44px; }
+#gr-command [data-command-empty] { margin-top:16px; }
+#gr-command [hidden] { display:none!important; }
+#gd-camera { inset:0; }
+@container guidance-form (max-width:540px) {
+  #guidance .gu-form-body, #guidance .gd-fields { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:900px) {
+  #guidance .gd-grid { grid-template-columns:minmax(0,1fr); }
+  #guidance .gu-pair { grid-template-columns:minmax(0,1fr); gap:0; }
+}
+@media(max-width:700px) {
+  /* Keep account/settings at the top right instead of wrapping to the left. */
+  body:has(#guidance) .topbar { display:grid; grid-template-columns:44px minmax(0,1fr) 44px 44px; gap:12px; align-items:center; }
+  body:has(#guidance) .topbar > .menu-btn { grid-column:1; grid-row:1; width:44px; height:44px; }
+  body:has(#guidance) .topbar > div:first-of-type { grid-column:1/-1; grid-row:2; }
+  body:has(#guidance) .topbar > .bell { grid-column:3; grid-row:1; }
+  body:has(#guidance) .topbar > .tb-user { grid-column:4; grid-row:1; margin-left:0; justify-self:end; }
+  body:has(#guidance) .tb-user .who { padding:0; min-width:44px; min-height:44px; justify-content:center; }
+  body:has(#guidance) .bell-menu { position:fixed; right:18px; top:74px; width:min(390px,calc(100vw - 36px)); max-height:calc(100dvh - 92px); overflow:auto; }
+  body:has(#guidance) .tb-menu { max-height:calc(100dvh - 92px); overflow:auto; }
+
+  #guidance .gd-grid.gd-three, #guidance .gd-fields, #guidance .gw-filters .gd-fields, #guidance .gu-form-body { grid-template-columns:minmax(0,1fr); }
+  #guidance .gd-card dl { grid-template-columns:minmax(0,1fr); gap:4px; }
+  #guidance .gd-card dd + dt { margin-top:10px; }
+  #guidance table.stack td { display:grid; grid-template-columns:minmax(80px,.65fr) minmax(0,1fr); gap:12px; text-align:left; align-items:start; }
+  #guidance table.stack td::before { max-width:none; }
+  #guidance table.stack td:first-child { display:block; }
+  #guidance table.stack td.gu-cell-wide, #guidance table.stack td:has(.gd-form) { grid-template-columns:minmax(0,1fr); gap:6px; }
+  #guidance table.stack .gd-cell { min-width:0; text-align:left; }
+  #guidance .gw-reports td:last-child strong { text-align:left; }
+  #guidance .gu-group-head h2 { font-size:21px; }
+  #guidance .gu-group { margin-top:24px; }
+  #guidance .gu-jumps { gap:4px 14px; }
+  #gr-command { padding:18px; }
+  #guidance input, #guidance select, #guidance textarea { font-size:16px; }
+}
+@media print {
+  #guidance .gu-jumps, #gr-command, #guidance [data-command-open] { display:none!important; }
+  #guidance .gu-group-head { break-after:avoid; }
+}

@@ -63,6 +63,10 @@ try {
     foreach (['gd_staff','gd_case_meta','gd_preferences','gd_feedback','gd_programs','gd_events','gd_invites','gd_certificates','gd_appointments','gd_articles','gd_privacy','gd_settings'] as $t) {
         $tables[$t] = gall('SELECT * FROM `'.$t.'`');
     }
+    if (gr_ready()) {
+        foreach (['gd_plus_students','gd_plus_services','gd_plus_cases','gd_plus_case_log','gd_plus_events','gd_plus_attendance','gd_plus_waitlist','gd_plus_notices','gd_plus_privacy','gd_plus_privacy_log'] as $table) $tables[$table]=gall('SELECT * FROM `'.$table.'`');
+        $tables['notifications_guidance']=gall('SELECT n.* FROM notifications n JOIN gd_plus_notices l ON l.notification_id=n.id');
+    }
     $tables['tickets'] = gall("SELECT * FROM tickets WHERE office_code='guide'");
     $tables['replies'] = gall("SELECT r.* FROM replies r JOIN tickets t ON t.id=r.ticket_id WHERE t.office_code='guide'");
     $tables['ticket_files'] = gall("SELECT f.* FROM ticket_files f JOIN tickets t ON t.id=f.ticket_id WHERE t.office_code='guide'");

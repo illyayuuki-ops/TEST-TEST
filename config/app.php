@@ -113,8 +113,10 @@ try {
     ]);
     $pdo->exec("SET time_zone = '" . date('P') . "'");   // keep MySQL NOW() and PHP time() on the same clock
 } catch (PDOException $ex) {
-    http_response_code(500);
-    exit('<h3 style="font-family:sans-serif">Database connection failed.</h3><p style="font-family:sans-serif">Import <code>database/ticketdesk.sql</code> and check the settings in <code>config/app.php</code>.</p>');
+    if (PHP_SAPI === 'cli') { fwrite(STDERR, "Database connection failed. Check the existing private configuration and database service. Do not import or reset the shared database.\n"); exit(1); }
+    http_response_code(503);
+    header('Cache-Control: no-store');
+    exit('<h3>Database temporarily unavailable.</h3><p>Contact the application administrator to check the database service and private configuration. Do not import, reset or replace the shared database.</p>');
 }
 
 require_once __DIR__ . '/../includes/audit.php';
