@@ -10,7 +10,7 @@ $staff = g_staff($u);
 $head = g_head($u);
 $view = (string)($_GET['view'] ?? 'overview');
 $id = max(0, (int)($_GET['id'] ?? 0));
-$titles = ['overview' => 'Guidance Office','requests' => 'Guidance requests','walkin' => 'Record a walk-in','appointments' => 'Appointments','events' => 'Activities & events','event' => 'Activity details','programs' => 'Recurring programs','calendar' => 'Guidance calendar','history' => 'Participation & credits','knowledge' => 'Knowledge & support','reports' => 'Aggregate reports','team' => 'Guidance team','categories' => 'Guidance services','privacy' => 'Privacy reviews','audit' => 'Guidance audit','settings' => 'My Guidance settings'];
+$titles = ['overview' => 'Guidance Office','requests' => 'Guidance requests','walkin' => 'Record a walk-in','appointments' => 'Appointments','events' => 'Activities','event' => 'Activity details','programs' => 'Programs','calendar' => 'Guidance calendar','history' => 'Certificates & credits','knowledge' => 'Resources','reports' => 'Aggregate reports','team' => 'Guidance team','categories' => 'Guidance services','privacy' => 'Privacy reviews','audit' => 'Guidance audit','settings' => 'Settings'];
 if (!isset($titles[$view])) {
     g_denied('Page not found.', 404);
 }if (in_array($view, ['reports','walkin'], true) && !$staff) {
@@ -45,7 +45,7 @@ function gc(string $name, string $label, bool $checked = false): string
 }
 function gform(string $action, string $body, string $submit = 'Save'): string
 {
-    return '<form class="gd-form" method="post" action="'.e(url('guidance/action.php')).'" data-gform>'.csrf_field().gh('action', $action).$body.'<p class="gd-error" role="alert"></p><button class="btn btn-primary" type="submit">'.e($submit).'</button></form>';
+    return '<form class="gd-form" method="post" action="'.e(url('guidance/action.php')).'" data-gform>'.csrf_field().gh('action', $action).$body.'<p class="gd-error" role="alert" tabindex="-1"></p><button class="btn btn-primary" type="submit">'.e($submit).'</button></form>';
 }
 function gl(string $view, string $text, int $id = 0, string $class = 'btn'): string
 {
@@ -59,10 +59,10 @@ function gempty(string $text = 'No records yet.'): string
 {
     return '<div class="empty gd-empty">'.e($text).'</div>';
 }
-function gtable(array $headers, array $rows): string
+function gtable(array $headers, array $rows, string $empty = 'Nothing to show yet. New records will appear here when available.'): string
 {
     if (!$rows) {
-        return gempty();
+        return gempty($empty);
     }$h = '<div class="table-wrap gd-tablewrap"><table class="stack"><thead><tr>';
     foreach ($headers as $a) {
         $h .= '<th>'.e($a).'</th>';
@@ -93,7 +93,7 @@ function gtimeinput(string $s): string
 function geform(array $e = []): string
 {
     $programs = [0 => 'Standalone activity'] + array_column(gall('SELECT id,title FROM gd_programs ORDER BY title'), 'title', 'id');
-    return gform('event.save', gh('id', $e['id'] ?? 0).gf('title', 'Activity title', 'text', $e['title'] ?? '', 'required minlength="3" maxlength="160"').ga('description', 'Description', $e['description'] ?? '', 'maxlength="10000"').'<div class="gd-fields">'.gs('kind', 'Activity type', gopts(['seminar','workshop','assembly','orientation','testing','career_fair','recollection','wellbeing','other']), $e['kind'] ?? 'workshop').gs('status', 'Status', gopts(['draft','published','completed','cancelled']), $e['status'] ?? 'draft').gf('starts_at', 'Start · Philippine time', 'datetime-local', gtimeinput($e['starts_at'] ?? ''), 'required').gf('ends_at', 'End · Philippine time', 'datetime-local', gtimeinput($e['ends_at'] ?? ''), 'required').gf('venue', 'Venue', 'text', $e['venue'] ?? '', 'required maxlength="160"').gf('capacity', 'Capacity', 'number', $e['capacity'] ?? 30, 'min="1" max="100000" required').gs('program_id', 'Program', $programs, $e['program_id'] ?? 0).gf('session_no', 'Session number', 'number', $e['session_no'] ?? 1, 'min="1" max="10000"').gf('minutes_before', 'Check-in minutes before start', 'number', $e['minutes_before'] ?? 30, 'min="0" max="240"').gf('minutes_after', 'Check-in minutes after end', 'number', $e['minutes_after'] ?? 60, 'min="0" max="240"').'</div>'.gc('certificates_enabled', 'Certificates after completion and eligible attendance', (bool)($e['certificates_enabled'] ?? 0)).gf('credit_units', 'Participation credits', 'number', $e['credit_units'] ?? 0, 'min="0" max="1000" step="0.25"'), $e ? 'Save activity' : 'Create activity');
+    return gform('event.save', '<p class="gd-note">Save as Draft while planning. Publish when details are ready, then invite students from the activity page. Keep activity descriptions free of private counseling details.</p>'.gh('id', $e['id'] ?? 0).gf('title', 'Activity title', 'text', $e['title'] ?? '', 'required minlength="3" maxlength="160"').ga('description', 'Description', $e['description'] ?? '', 'maxlength="10000"').'<div class="gd-fields">'.gs('kind', 'Activity type', gopts(['seminar','workshop','assembly','orientation','testing','career_fair','recollection','wellbeing','other']), $e['kind'] ?? 'workshop').gs('status', 'Status', gopts(['draft','published','completed','cancelled']), $e['status'] ?? 'draft').gf('starts_at', 'Start · Philippine time', 'datetime-local', gtimeinput($e['starts_at'] ?? ''), 'required').gf('ends_at', 'End · Philippine time', 'datetime-local', gtimeinput($e['ends_at'] ?? ''), 'required').gf('venue', 'Venue', 'text', $e['venue'] ?? '', 'required maxlength="160"').gf('capacity', 'Capacity', 'number', $e['capacity'] ?? 30, 'min="1" max="100000" required').gs('program_id', 'Program', $programs, $e['program_id'] ?? 0).gf('session_no', 'Session number', 'number', $e['session_no'] ?? 1, 'min="1" max="10000"').gf('minutes_before', 'Check-in minutes before start', 'number', $e['minutes_before'] ?? 30, 'min="0" max="240"').gf('minutes_after', 'Check-in minutes after end', 'number', $e['minutes_after'] ?? 60, 'min="0" max="240"').'</div>'.gc('certificates_enabled', 'Certificates after completion and eligible attendance', (bool)($e['certificates_enabled'] ?? 0)).gf('credit_units', 'Participation credits', 'number', $e['credit_units'] ?? 0, 'min="0" max="1000" step="0.25"'), $e ? 'Save activity' : 'Create activity');
 }
 $caseWhere = $head ? '1=1' : ($staff === 'counselor' ? 't.assigned_to='.$uid : ($staff ? '0=1' : 't.user_id='.$uid));
 $cases = gall("SELECT t.*,c.name AS category,u.full_name AS requester,a.full_name AS counselor FROM tickets t JOIN users u ON u.id=t.user_id LEFT JOIN users a ON a.id=t.assigned_to LEFT JOIN categories c ON c.id=t.category_id WHERE t.office_code='guide' AND $caseWhere ORDER BY t.updated_at DESC,t.id DESC");
@@ -101,19 +101,26 @@ $events = $staff ? gall('SELECT * FROM gd_events ORDER BY starts_at DESC') : gal
 $appointments = gall('SELECT a.*,u.full_name AS requester,c.full_name AS counselor FROM gd_appointments a JOIN users u ON u.id=a.user_id JOIN users c ON c.id=a.counselor_id'.($head ? '' : ($staff === 'counselor' ? ' WHERE a.counselor_id='.$uid : ' WHERE a.user_id='.$uid)).' ORDER BY a.starts_at DESC');
 $students = $staff ? gall("SELECT id,full_name,school_id FROM users WHERE role='student' AND status='active' AND verification='verified' ORDER BY full_name") : [];
 $certs = gall('SELECT * FROM gd_certificates WHERE user_id=? ORDER BY issued_at DESC', [$uid]);
-page_start($titles[$view], 'LCCT · Shared campus application · Guidance Office');
+page_start($titles[$view], 'LCCT · Guidance Office');
 ?>
 <link rel="stylesheet" href="<?= e(url('guidance/assets/guidance.css')) ?>?v=<?= (int)filemtime(__DIR__.'/assets/guidance.css') ?>">
+<?php if ($view === 'team'): ?><link rel="stylesheet" href="<?= e(url('guidance/assets/password.css')) ?>?v=<?= (int)filemtime(__DIR__.'/assets/password.css') ?>"><?php endif; ?>
 <div id="guidance" data-state="<?= e(url('guidance/state.php')) ?>" data-sig="<?= e($initialSignature) ?>" data-action="<?= e(url('guidance/action.php')) ?>" data-csrf="<?= e(csrf_token()) ?>">
 <?php if (getenv('LCCT_SYNTHETIC_TEST') === '1'): ?><div class="alert warn">Synthetic local review database. No real school records or email delivery.</div><?php endif; ?>
 <?php
 if ($view === 'overview') {
     $lastCaseUpdate = $cases ? max(array_column($cases, 'updated_at')) : null;
-    $heroActions = is_filer($u)
-        ? '<a class="btn btn-primary" href="'.e(url('student/new_ticket.php?office=guide')).'">New Guidance request</a>'
-        : gl('requests', 'Open my queue', 0, 'btn btn-primary');
-    $heroActions .= gl('events', 'Explore activities');
-    echo dash_hero('Guidance Office', 'Welcome to Guidance', 'Ask for support, make time for a conversation, and follow your Guidance activities using your campus account.', $lastCaseUpdate, $heroActions);
+    if ($staff === 'administrator') $lastCaseUpdate = $events ? max(array_column($events, 'updated_at')) : null;
+    if (is_filer($u)) {
+        $heroActions = '<a class="btn btn-primary" href="'.e(url('student/new_ticket.php?office=guide')).'">Request Guidance</a>'.gl('appointments', 'Book an appointment').gl('events', 'My activities');
+    } elseif ($staff === 'administrator') {
+        $heroActions = gl('events', 'Manage activities', 0, 'btn btn-primary').gl('programs', 'Manage programs').gl('reports', 'Aggregate reports');
+    } else {
+        $heroActions = gl('requests', $head ? 'Review requests' : 'Assigned requests', 0, 'btn btn-primary').gl('appointments', 'Appointments').gl('events', 'Activities');
+    }
+    $roleCaption = ['head'=>'Guidance Head','counselor'=>'Counselor','administrator'=>'Guidance Administrator'][$staff ?? ''] ?? 'Student Guidance';
+    $welcome = is_filer($u) ? 'Follow your requests, appointments and Guidance activities.' : ($staff === 'administrator' ? 'Plan activities, manage programs and follow participation.' : 'Review your authorized requests and upcoming appointments.');
+    echo dash_hero($roleCaption, 'Hi '.e(explode(' ', $u['full_name'])[0]).', welcome back', $welcome, $lastCaseUpdate, $heroActions, $staff === 'administrator' ? 'No activities yet' : 'No requests yet');
     echo '<div class="stats">';
     $summary = [
         [count(array_filter($cases, fn ($t) => !in_array($t['status'], ['Closed','Cancelled','Resolved'], true))), 'Active requests', 'within your authorized access', 'blue', 'fa-inbox'],
@@ -121,11 +128,19 @@ if ($view === 'overview') {
         [count($events), 'Activities', 'available in your workspace', 'blue', 'fa-calendar-days'],
         [count($certs), 'My certificates', 'earned participation records', 'green', 'fa-award']
     ];
+    if ($staff === 'administrator') {
+        $summary = [
+            [count(array_filter($events, fn($e)=>$e['status']==='published')), 'Published', 'activities ready for participants', 'blue', 'fa-calendar-days'],
+            [count(array_filter($events, fn($e)=>$e['status']==='draft')), 'Drafts', 'activities being planned', 'gold', 'fa-pen'],
+            [(int)gq('SELECT COUNT(*) FROM gd_programs WHERE active=1')->fetchColumn(), 'Programs', 'active Guidance programs', 'blue', 'fa-seedling'],
+            [count(array_filter($events, fn($e)=>$e['status']==='completed')), 'Completed', 'finished Guidance activities', 'green', 'fa-circle-check']
+        ];
+    }
     foreach ($summary as [$n,$label,$hint,$color,$icon]) {
         echo '<div class="stat" style="--c:var(--'.e($color).')"><i class="fa-solid '.e($icon).' ic" aria-hidden="true"></i><div class="k">'.e($label).'</div><div class="v">'.$n.'</div><div class="s">'.e($hint).'</div></div>';
     }
     echo '</div>';
-    echo '<div class="gd-grid">'.gcard('One connected service', '<p>Requests are stored in the existing <b>tickets</b> table. Replies, files, status tracking and the notification bell are the shared system’s own features.</p>'.gl('requests', 'View requests')).gcard('Private by design', '<p>Guidance cases are visible to their student owner, assigned counselor and Guidance head—not unrelated office staff or every administrator.</p><div class="gd-note">This is not an emergency service. For immediate danger, contact emergency services and a trusted adult or campus authority.</div>').'</div>';
+    require __DIR__.'/overview.php';
 } elseif ($view === 'requests') {
     echo '<div class="gd-buttons">'.(is_filer($u) ? '<a class="btn btn-primary" href="'.e(url('student/new_ticket.php?office=guide')).'">New Guidance request</a>' : (in_array($staff, ['head','counselor'], true) ? gl('walkin', 'Record a walk-in') : '')).'</div>';
     $rows = [];
@@ -135,7 +150,7 @@ if ($view === 'overview') {
             $details .= gdetails('Rate this service', gform('feedback', gh('id', $t['id']).gs('rating', 'Rating', [1 => '1 / 5',2 => '2 / 5',3 => '3 / 5',4 => '4 / 5',5 => '5 / 5'], 5).ga('feedback', 'Feedback', '', 'maxlength="2000"'), 'Send feedback'));
         }$rows[] = [$details,e($t['requester']),e($t['category']),badge($t['status']),prio_badge($t['priority']),e($t['counselor'] ?: 'Awaiting assignment')];
     }
-    echo gcard('Shared Guidance tickets', '<label class="field"><span class="lbl">Search this list</span><input data-search type="search" placeholder="Reference, subject or status…"></label>'.gtable(['Request','Requester','Service','Status','Priority','Counselor'], $rows));
+    echo gcard(is_filer($u) ? 'My Guidance requests' : 'Guidance requests', '<p>Use a short, clear subject and share only the details needed for your request. Attach relevant files only; never include passwords or unrelated personal records.</p><label class="field"><span class="lbl">Search this list</span><input data-search type="search" placeholder="Reference, subject or status…"></label>'.gtable(['Request','Requester','Service','Status','Priority','Counselor'], $rows, is_filer($u) ? 'No Guidance requests yet. Select New Guidance request above to ask for support.' : ($staff === 'administrator' ? 'Clinical requests are not part of your activity-administrator access.' : 'No requests in your queue. Counselors see cases after the Guidance head assigns them.')));
     if (!$cases) {
         echo '<p class="muted">If you are a counselor, the head must assign a confidential case before it appears here.</p>';
     }
@@ -149,10 +164,10 @@ if ($view === 'overview') {
             $body .= gform('appointment.update', gh('id', $a['id']).gs('status', 'Update', ($head || $staff === 'counselor') ? gopts(['confirmed','completed','cancelled']) : ['cancelled' => 'Cancel appointment']), 'Update appointment');
         }echo gcard('Appointment', $body);
     }if (!$appointments) {
-        echo gempty('No appointments in your authorized schedule.');
+        echo gempty(is_filer($u) ? 'No appointments yet. Use the form to request a time with a counselor.' : 'No appointments in your schedule. New requests will appear here when assigned to you or visible to your role.');
     }echo '</div>';
     if (is_filer($u)) {
-        echo gcard('Request a time', gform('appointment.create', gs('counselor_id', 'Counselor', array_column(g_counselors(), 'full_name', 'id'), '', 'required').gf('starts_at', 'Start · Philippine time', 'datetime-local', '', 'required').gf('ends_at', 'End · Philippine time', 'datetime-local', '', 'required').ga('concern', 'Brief reason', '', 'required minlength="5" maxlength="4000"').'<div class="gd-note">Maximum two hours. Requested and confirmed appointments reserve the time.</div>', 'Request appointment'));
+        echo gcard('Request a time', gform('appointment.create', gs('counselor_id', 'Counselor', array_column(g_counselors(), 'full_name', 'id'), '', 'required').gf('starts_at', 'Start · Philippine time', 'datetime-local', '', 'required').gf('ends_at', 'End · Philippine time', 'datetime-local', '', 'required').ga('concern', 'Brief reason', '', 'required minlength="5" maxlength="4000" placeholder="For example: I would like help planning my study schedule."').'<div class="gd-note">Use Philippine local time and choose a future start and end, up to two hours apart. This is a request, not yet a confirmed appointment. Keep the reason brief; discuss sensitive details with your counselor.</div>', 'Request appointment'));
     }echo '</div>';
 } elseif ($view === 'events') {
     if ($staff) {
@@ -162,7 +177,7 @@ if ($view === 'overview') {
         echo gcard($e['title'], '<span class="gd-eyebrow">'.e(str_replace('_', ' ', $e['kind'])).'</span><p>'.e(fmt_dt($e['starts_at'])).'<br>'.e($e['venue']).'</p><p>'.e(mb_strimwidth($e['description'], 0, 150, '…')).'</p><div class="gd-buttons">'.gtag($e['status']).gl('event', 'Open activity', (int)$e['id']).'</div>');
     }echo '</div>';
     if (!$events) {
-        echo gempty('Published invitations will appear here.');
+        echo gempty($staff ? 'No activities yet. Open Create a Guidance activity above to plan one.' : 'No activity invitations yet. When Guidance invites you, open the activity to accept or decline.');
     }
 } elseif ($view === 'event') {
     try {
@@ -205,9 +220,11 @@ if ($view === 'overview') {
     echo gcard('Participation', gtable($staff ? ['Participant','RSVP','Attendance'] : ['RSVP','Attendance'], array_map(fn ($i) => $staff ? [e($i['full_name']),gtag($i['state']),gtag($i['attendance'])] : [gtag($i['state']),gtag($i['attendance'])], $inv))).'</div></div>';
 } elseif ($view === 'programs') {
     if ($staff) {
-        echo gcard('Add a recurring program', gdetails('Create program', gform('program.save', gf('title', 'Program title', 'text', '', 'required minlength="3" maxlength="160"').ga('description', 'Description', '', 'maxlength="5000"').gc('active', 'Active program', true), 'Create program')));
+        echo gcard('Add a Guidance program', gdetails('Create program', gform('program.save', '<p>Group related activities under a program, such as a study-skills series. Create and schedule each session separately.</p>'.gf('title', 'Program title', 'text', '', 'required minlength="3" maxlength="160" placeholder="For example: Study skills series"').ga('description', 'Description', '', 'maxlength="5000"').gc('active', 'Active program', true), 'Create program')));
     }
-    foreach (gall('SELECT * FROM gd_programs'.($staff ? '' : ' WHERE active=1').' ORDER BY title') as $p) {
+    $programRows = gall('SELECT * FROM gd_programs'.($staff ? '' : ' WHERE active=1').' ORDER BY title');
+    if (!$programRows) echo gempty($staff ? 'No programs yet. Create one to group related activity sessions.' : 'No programs are available yet. You can still check Activities for your invitations.');
+    foreach ($programRows as $p) {
         $body = '<p>'.e($p['description']).'</p>';
         foreach ($events as $e) {
             if ((int)$e['program_id'] === (int)$p['id']) {
@@ -224,7 +241,7 @@ if ($view === 'overview') {
     }foreach ($appointments as $a) {
         $rows[] = [$a['starts_at'],gl('appointments', 'Appointment · '.$a['counselor']),gtag($a['status'])];
     }usort($rows, fn ($a, $b) => strcmp($a[0], $b[0]));
-    echo gcard('Activities and appointments', gtable(['When · Philippine time','Activity','Status'], array_map(fn ($r) => [e(fmt_dt($r[0])),$r[1],$r[2]], $rows)));
+    echo gcard('Activities and appointments', gtable(['When · Philippine time','Activity','Status'], array_map(fn ($r) => [e(fmt_dt($r[0])),$r[1],$r[2]], $rows), 'Your appointments and available activities will appear here. Check Appointments or Activities to get started.'));
 } elseif ($view === 'history') {
     $inv = gall('SELECT i.*,e.title FROM gd_invites i JOIN gd_events e ON e.id=i.event_id WHERE i.user_id=? ORDER BY e.starts_at DESC', [$uid]);
     $rows = [];
@@ -235,7 +252,7 @@ if ($view === 'overview') {
                 $cert = $c;
             }
         }$rows[] = [gl('event', $i['title'], (int)$i['event_id']),gtag($i['state']),gtag($i['attendance']),$cert ? '<a href="'.e(url('guidance/certificate.php?id='.$cert['id'])).'" target="_blank" rel="noopener">Print certificate · '.e($cert['credits']).' credits</a>' : 'Not issued'];
-    }echo gcard('Your milestones', '<p class="gd-credit">'.e(array_sum(array_column($certs, 'credits'))).' credits earned</p>'.gtable(['Activity','RSVP','Attendance','Certificate'], $rows));
+    }echo gcard('Your milestones', '<p class="gd-credit">'.e(array_sum(array_column($certs, 'credits'))).' credits earned</p>'.gtable(['Activity','RSVP','Attendance','Certificate'], $rows, 'No participation history yet. Accept an activity invitation to begin. Eligible certificates appear here after attendance and activity completion.'));
 } elseif ($view === 'knowledge') {
     if ($staff) {
         echo gcard('Publish support information', gdetails('Write an article', gform('article.save', gf('title', 'Title', 'text', '', 'required minlength="3" maxlength="160"').ga('body', 'Article', '', 'required minlength="10" maxlength="30000"').gc('published', 'Publish for students'), 'Save article')));
@@ -244,7 +261,7 @@ if ($view === 'overview') {
     foreach ($articles as $a) {
         echo gcard($a['title'], ((int)$a['published'] ? '' : gtag('draft')).'<p class="gd-pre">'.e($a['body']).'</p>'.($staff ? gdetails('Edit article', gform('article.save', gh('id', $a['id']).gf('title', 'Title', 'text', $a['title'], 'required').ga('body', 'Article', $a['body'], 'required').gc('published', 'Published', (bool)$a['published']))) : ''));
     }if (!$articles) {
-        echo gempty('No published articles yet.');
+        echo gempty('No resources have been published yet. You can still request Guidance or book an appointment.');
     }
 } elseif ($view === 'reports') {
     echo gcard('Privacy-preserving totals', '<p>Aggregate counts only. Cells below five are suppressed. No student identities or counseling text are included.</p><p><a class="btn" href="'.e(url('guidance/export.php?type=reports')).'">Download aggregate CSV</a></p>'.gtable(['Dimension','Group','Value'], array_map(fn ($r) => array_map('e', $r), g_reports())));
@@ -254,7 +271,7 @@ if ($view === 'overview') {
         echo gcard($c['name'], gdetails('Edit service', gform('category.save', gh('id', $c['id']).gf('name', 'Service name', 'text', $c['name'], 'required minlength="2" maxlength="60"').gc('hidden', 'Hidden from new requests', (bool)$c['is_hidden']))));
     }
 } elseif ($view === 'team') {
-    echo gcard('Add a shared Guidance staff account', gdetails('Create staff account', gform('staff.create', gf('full_name', 'Full name', 'text', '', 'required minlength="3" maxlength="120"').gf('username', 'Username', 'text', '', 'required minlength="3" maxlength="30"').gf('email', 'Email', 'email', '', 'required maxlength="120"').gf('password', 'Temporary password · 12+ characters', 'password', '', 'required minlength="12" maxlength="128" autocomplete="new-password"').gs('guidance_role', 'Guidance role', gopts(['counselor','administrator','head']), 'counselor').'<p>Uses the existing users table. Password change is required on first sign-in.</p>', 'Create account')));
+    echo gcard('Add Guidance staff', gdetails('Create staff account', gform('staff.create', gf('full_name', 'Full name', 'text', '', 'required minlength="3" maxlength="120"').gf('username', 'Username', 'text', '', 'required minlength="3" maxlength="30"').gf('email', 'Email', 'email', '', 'required maxlength="120"').gp_field('password', 'Temporary password', 'new').gp_field('password_confirm', 'Confirm temporary password', 'confirm').gs('guidance_role', 'Guidance role', gopts(['counselor','administrator','head']), 'counselor').'<p>Share the temporary password privately with the staff member. They must change it at first sign-in; do not send it in a ticket or public message.</p>', 'Create account')));
     foreach (gall("SELECT u.id,u.full_name,u.username,u.status,s.guidance_role,s.active FROM users u LEFT JOIN gd_staff s ON s.user_id=u.id WHERE u.role='admin' AND u.office_code='guide' ORDER BY u.full_name") as $m) {
         echo gcard($m['full_name'], '<p>'.e($m['username']).' · shared account '.e($m['status']).'</p>'.gform('staff.save', gh('user_id', $m['id']).gs('guidance_role', 'Guidance role', gopts(['head','counselor','administrator']), $m['guidance_role'] ?? 'counselor').gc('active', 'Guidance access enabled', (bool)($m['active'] ?? 0))));
     }
@@ -270,14 +287,17 @@ if ($view === 'overview') {
     echo gcard('Actions, not counseling content', gtable(['When','Actor','Action','Reference'], array_map(fn ($r) => array_map('e', array_values($r)), $rows)));
 } elseif ($view === 'settings') {
     $pref = gone('SELECT * FROM gd_preferences WHERE user_id=?', [$uid]);
-    echo '<div class="gd-grid">'.gcard('Your shared identity', '<h3>'.e($u['full_name']).'</h3><p>'.e($u['username']).' · '.e($staff ?: 'student').'</p><p><a class="btn" href="'.e(url('auth/change_password.php')).'">Change shared password</a></p>'.gform('preferences', gc('ticket_updates', 'Receive in-app Guidance ticket updates', !$pref || (bool)$pref['ticket_updates'])).'<hr>'.gform('sessions', '<p>Revoke every shared session, including this browser.</p>', 'Sign out all sessions')).gcard('Your data and privacy', '<p><a class="btn" href="'.e(url('guidance/export.php')).'">Download my Guidance records</a></p><div class="gd-note">Your export excludes other people’s records and internal notes. A privacy request starts a review, not automatic deletion.</div>'.gform('privacy.submit', ga('reason', 'Privacy review request', '', 'required minlength="10" maxlength="4000"'), 'Submit request')).'</div>';
+    if ($head) echo gcard('Guidance administration', '<p>Manage staff access and the services offered by your office.</p><div class="gd-buttons">'.gl('team', 'Guidance team').gl('categories', 'Services').'</div>');
+    echo '<div class="gd-grid">'.gcard('Your campus account', '<h3>'.e($u['full_name']).'</h3><p>'.e($u['username']).' · '.e($staff ?: 'student').'</p>'.(is_filer($u) ? '<p><a class="btn" href="'.e(url('student/profile.php')).'">Edit profile</a></p>' : '').'<p><a class="btn" href="'.e(url('auth/change_password.php?from=guidance')).'">Change password</a></p>'.gform('preferences', gc('ticket_updates', 'Receive in-app Guidance ticket updates', !$pref || (bool)$pref['ticket_updates'])).'<hr>'.gform('sessions', '<p>Revoke every shared session, including this browser.</p>', 'Sign out all sessions')).gcard('Your data and privacy', '<p><a class="btn" href="'.e(url('guidance/export.php')).'">Download my Guidance records</a></p><div class="gd-note">Your export excludes other people’s records and internal notes. A privacy request starts a review, not automatic deletion.</div>'.gform('privacy.submit', ga('reason', 'Privacy review request', '', 'required minlength="10" maxlength="4000" placeholder="Explain what you would like the Guidance head to review."'), 'Submit request')).'</div>';
     foreach (gall('SELECT * FROM gd_privacy WHERE user_id=? ORDER BY updated_at DESC', [$uid]) as $p) {
         echo gcard('Your privacy request', gtag($p['status']).'<p class="gd-pre">'.e($p['reason']).'</p><p class="gd-pre">'.e($p['response'] ?? 'Awaiting review.').'</p>');
     }
 }
 ?>
-<p class="gd-foot">Guidance uses the shared campus account and ticket records. Dates are Philippine local time. <span id="gd-live">Live updates · draft protection enabled</span></p>
+<p class="gd-foot">Use your campus account for Guidance requests, appointments and activities. All times shown are Philippine local time. <span id="gd-live">Live updates · draft protection enabled</span></p>
 </div>
 <dialog id="gd-camera"><h2>Guidance QR check-in</h2><video autoplay muted playsinline></video><p id="gd-camera-note">Camera needs HTTPS or localhost. Manual entry remains available.</p><button class="btn" type="button" data-camera-close>Close camera</button></dialog>
 <script src="<?= e(url('guidance/assets/vendor/qrcode.js')) ?>"></script><script src="<?= e(url('guidance/assets/vendor/jsQR.js')) ?>"></script><script src="<?= e(url('guidance/assets/guidance.js')) ?>" defer></script>
+<?php if ($view === 'team'): ?><script src="<?= e(url('guidance/assets/password.js')) ?>?v=<?= (int)filemtime(__DIR__.'/assets/password.js') ?>" defer></script><?php endif; ?>
+<?php if ($view === 'overview'): ?><script src="<?= e(url('guidance/assets/overview.js')) ?>?v=<?= (int)filemtime(__DIR__.'/assets/overview.js') ?>" defer></script><?php endif; ?>
 <?php page_end(); ?>

@@ -84,7 +84,7 @@ try:
  post(a,'preferences',{});before=a.get(B+'/notif.php').json()['last'];native(c,'ticket.php?id='+str(tid),{'action':'reply','message':'Preference suppression test.'});check('ticket update preference honored',a.get(B+'/notif.php').json()['last']==before)
  post(head,'staff.save',{'user_id':ids['head'],'guidance_role':'administrator','active':0},409)
  post(head,'staff.save',{'user_id':ids['counselor'],'guidance_role':'administrator','active':1},409)
- newname='review_'+uuid.uuid4().hex[:8];post(head,'staff.create',{'username':newname,'full_name':'Synthetic new counselor','email':newname+'@example.invalid','password':'TemporaryTest2026!','guidance_role':'counselor'})
+ newname='review_'+uuid.uuid4().hex[:8];post(head,'staff.create',{'username':newname,'full_name':'Synthetic new counselor','email':newname+'@example.invalid','password':'TemporaryTest2026!','password_confirm':'TemporaryTest2026!','guidance_role':'counselor'})
  fresh=login(newname,'TemporaryTest2026!');check('new staff forced password change','Change password' in fresh.get(B+'/guidance/index.php').text)
  native(fresh,'auth/change_password.php',{'current':'TemporaryTest2026!','new':'UpdatedTest2026!','new2':'UpdatedTest2026!'})
  fresh=login(newname,'UpdatedTest2026!');page(fresh,'guidance/index.php')

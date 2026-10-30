@@ -2,6 +2,13 @@
 require __DIR__ . '/../config/app.php';
 require __DIR__ . '/../includes/layout.php';
 $u = require_role('student', 'admin');
+// Guidance-specific experience; other offices retain their existing account policy.
+if (g_ready() && (g_staff($u) !== null || (is_filer($u) && ($_GET['from'] ?? '') === 'guidance'))) {
+    define('GD_PASSWORD_PAGE', true);
+    require __DIR__.'/../guidance/password-page.php';
+    exit;
+}
+
 
 $st = $pdo->prepare('SELECT password, must_change_password FROM users WHERE id=?');
 $st->execute([$u['id']]);

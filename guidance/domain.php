@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__).'/includes/guidance-password.php';
 
 function gx(bool $ok, string $msg = 'Not allowed.', int $status = 403): void
 {
@@ -281,10 +282,12 @@ function g_action(array $u, string $action, array $p): array
             gx((bool)preg_match('/^[a-zA-Z0-9_.]+$/', $username), 'Invalid username.', 400);
             $email = gt($p, 'email', 3, 120);
             gx((bool)filter_var($email, FILTER_VALIDATE_EMAIL), 'Invalid email.', 400);
-            $pw = gt($p, 'password', 12, 128);
-            gx(preg_match('/[A-Z]/', $pw) && preg_match('/[a-z]/', $pw) && preg_match('/[0-9]/', $pw), 'Use uppercase, lowercase and a number.', 400);
+            $pw = gp_value($p, 'password');
+            $passwordError = gp_error($pw);
+            gx($passwordError === null, $passwordError ?? '', 400);
+            gx($pw === gp_value($p, 'password_confirm'), 'Temporary passwords do not match.', 400);
             gx(!gone('SELECT id FROM users WHERE username=? OR email=?', [$username,$email]), 'Username or email already exists.', 409);
-            gq("INSERT INTO users(username,email,full_name,password,role,office_code,must_change_password,verification) VALUES(?,?,?,?,'admin','guide',1,'verified')", [$username,$email,$name,password_hash($pw, PASSWORD_DEFAULT)]);
+            gq("INSERT INTO users(username,email,full_name,password,role,office_code,must_change_password,verification) VALUES(?,?,?,?,'admin','guide',1,'verified')", [$username,$email,$name,gp_hash($pw)]);
             $id = (int)$pdo->lastInsertId();
             gq('INSERT INTO gd_staff(user_id,guidance_role) VALUES(?,?)', [$id,ge($p, 'guidance_role', ['head','counselor','administrator'], 'counselor')]);
             $next .= '?view=team';
@@ -306,6 +309,22 @@ function g_action(array $u, string $action, array $p): array
             $next .= '?view=privacy';
             break;
         default:gx(false, 'Unknown action.', 404);
+    }
+    if ($msg === 'Saved successfully.') {
+        $messages = [
+            'walkin'=>'Request created. You can now review it and add updates.',
+            'feedback'=>'Thank you. Your service feedback has been recorded.',
+            'appointment.create'=>'Appointment requested. Check this page for confirmation.',
+            'appointment.update'=>'Appointment updated. Please review its current status.',
+            'program.save'=>'Program saved.', 'event.save'=>'Activity saved.',
+            'rsvp'=>'Your activity response has been saved.', 'checkin'=>'Attendance recorded.',
+            'attendance'=>'Attendance updated.', 'article.save'=>'Resource saved.',
+            'category.save'=>'Guidance service saved.', 'staff.create'=>'Staff account created. Share the temporary password privately; a change is required at first sign-in.',
+            'staff.save'=>'Guidance access updated.', 'preferences'=>'Your notification preference has been saved.',
+            'privacy.submit'=>'Your privacy review request has been sent to the Guidance head.',
+            'privacy.review'=>'Privacy review response saved.'
+        ];
+        $msg = $messages[$action] ?? $msg;
     }
     g_audit($u, $action, (string)$id);
     return ['message' => $msg,'redirect' => url($next),'id' => $id];

@@ -1,0 +1,14 @@
+/* Guidance sidebar groups only. No dashboard or shared-theme overrides. */
+#sidebar .gd-nav-group{margin:12px 0 6px;border-top:1px solid var(--line);padding-top:10px}
+#sidebar .gd-nav-group>summary{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 12px;list-style:none;border-radius:16px;color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
+#sidebar .gd-nav-group>summary::-webkit-details-marker{display:none}
+#sidebar .gd-nav-group>summary::marker{content:''}
+#sidebar .gd-nav-group>summary>i{width:18px;flex-shrink:0;text-align:center;color:var(--blue)}
+#sidebar .gd-nav-group>summary>span{flex:1;min-width:0;overflow-wrap:anywhere}
+#sidebar .gd-nav-group>summary:hover,#sidebar .gd-nav-group.has-active>summary{background:var(--sky);color:var(--deep)}
+#sidebar .gd-nav-group>summary:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+#sidebar .gd-nav-chevron{flex-shrink:0;transition:transform .2s}
+#sidebar .gd-nav-group[open]>summary .gd-nav-chevron{transform:rotate(90deg)}
+#sidebar .gd-nav-group-links{border-left:2px solid var(--line);margin:6px 0 0 19px;padding:3px 0 0 8px}
+#sidebar .gd-nav-group-links a{padding-left:10px;font-size:13.5px;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){#sidebar .gd-nav-group>summary,#sidebar .gd-nav-chevron{transition:none}}

@@ -70,3 +70,11 @@
 
 /* Preserve search filtering when the native mobile stack sets display:block. */
 #guidance table.stack tr[hidden] { display: none; }
+
+/* Native student dashboard grid and cards, reused for every Guidance role. */
+#guidance .gd-overview [hidden] { display: none !important; }
+#guidance .gd-overview .filters { flex-wrap: wrap; }
+#guidance .gd-overview .filters input { min-width: 0; }
+#guidance .gd-overview .tk-title, #guidance .gd-overview .tk-sub { overflow-wrap: anywhere; }
+#guidance .gd-overview > *, #guidance .gd-overview .tk-card { min-width: 0; }
+@media(max-width:700px) { #guidance .gd-overview .filters input, #guidance .gd-overview .filters select { width: 100%; flex-basis: 100%; } }

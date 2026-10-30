@@ -18,7 +18,7 @@ const out = path.join(__dirname,'output'); fs.mkdirSync(out,{recursive:true});
    await go(s,'guidance/index.php?view='+v+(v==='event'?'&id='+eid:''));
    const active=await s.$$eval('.nav a.active',es=>es.map(e=>({url:e.getAttribute('href'),current:e.getAttribute('aria-current')})));
    const expected=v==='event'?'events':v;
-   check('Exactly the selected Guidance menu is active: '+v,active.length===1&&(new URL(active[0].url,base).searchParams.get('view')||'overview')===expected&&active[0].current==='page');
+   check('Correct sidebar state: '+v,v==='settings' ? active.length===0 : active.length===1&&(new URL(active[0].url,base).searchParams.get('view')||'overview')===expected&&active[0].current==='page');
   }
   await go(h,'guidance/index.php?view=walkin');check('Walk-in highlights Requests',await h.$eval('.nav a.active',e=>e.getAttribute('href').endsWith('view=requests')));
   await go(h,'guidance/index.php?view=overview');check('Query overview does not mark every link',await h.$$eval('.nav a.active',es=>es.length===1));

@@ -53,8 +53,8 @@ function ticket_tracker(array $t, bool $full = false): string {
 }
 
 function nav_for(array $u): array {
-    if(is_filer($u)&&str_contains(str_replace('\\','/',$_SERVER['SCRIPT_NAME']??''),'/guidance/')) return array_merge(g_nav($u),[['Shared portal',null,null],['All my tickets','student/dashboard.php','fa-ticket'],['New ticket','student/new_ticket.php','fa-plus'],['Profile','student/profile.php','fa-id-badge'],['Password','auth/change_password.php','fa-key']]);
-    if ($u['role']==='admin' && ($u['office_code']??'')==='guide') return array_merge(g_nav($u),[['Password','auth/change_password.php','fa-key']]);
+    if(is_filer($u)&&(str_contains(str_replace('\\','/',$_SERVER['SCRIPT_NAME']??''),'/guidance/')||defined('GD_PASSWORD_PAGE'))) return array_merge(g_nav($u),[['Shared portal',null,null],['All my tickets','student/dashboard.php','fa-ticket'],['New ticket','student/new_ticket.php','fa-plus']]);
+    if ($u['role']==='admin' && ($u['office_code']??'')==='guide') return g_nav($u);
     if ($u['role'] === 'admin') {
         $nav = [
             ['Tickets', null, null],
@@ -75,9 +75,6 @@ function nav_for(array $u): array {
         ['New Ticket', 'student/new_ticket.php', 'fa-plus'],
         ['Guidance Office', null, null],
         ['Guidance services','guidance/index.php','fa-people-group'],
-        ['Account', null, null],
-        ['Profile', 'student/profile.php', 'fa-id-badge'],
-        ['Password', 'auth/change_password.php', 'fa-key'],
     ];
 }
 
@@ -85,22 +82,25 @@ function nav_for(array $u): array {
 function fmt_dt(?string $ts): string { return $ts ? date('M j, Y g:i A', strtotime($ts)) : '—'; }
 
 /** Campus-photo banner at the top of a dashboard: greeting, short line, the last update time and action buttons. */
-function dash_hero(string $eyebrow, string $title, string $text, ?string $lastTs, string $actions = ''): string {
+function dash_hero(string $eyebrow, string $title, string $text, ?string $lastTs, string $actions = '', string $emptyLabel = 'No tickets yet'): string {
     return '<section class="hero" style="--hero:url(\'' . e(url('assets/img/campus-banner.jpg')) . '\')">'
         . '<div class="hero-in"><div class="hero-txt"><span class="hero-eye">' . $eyebrow . '</span><h2>' . $title . '</h2><p>' . $text . '</p>'
         . ($actions ? '<div class="hero-act">' . $actions . '</div>' : '') . '</div>'
         . '<div class="hero-last"><span class="hl-k"><i class="fa-regular fa-clock"></i>Last update</span><b>' . e(fmt_dt($lastTs)) . '</b>'
-        . ($lastTs ? '<small>' . e(time_ago($lastTs)) . '</small>' : '<small>No tickets yet</small>') . '</div></div></section>';
+        . ($lastTs ? '<small>' . e(time_ago($lastTs)) . '</small>' : '<small>'.e($emptyLabel).'</small>') . '</div></div></section>';
 }
 
 /** Guidance uses query-string views; leave other shared routes' matching unchanged. */
 function nav_is_active(string $currentPath, string $href): bool {
+    // Account subpages live under a single Settings entry, not separate sidebar items.
+    if ($href === 'student/settings.php' && in_array($currentPath, ['student/profile.php','auth/change_password.php'], true)) return true;
+    if ($href === 'guidance/index.php?view=settings' && $currentPath === 'auth/change_password.php') return true;
     if ($currentPath !== 'guidance/index.php' || parse_url($href, PHP_URL_PATH) !== 'guidance/index.php') {
         return $currentPath === $href;
     }
     parse_str((string)(parse_url($href, PHP_URL_QUERY) ?? ''), $linkQuery);
     $view = (string)($_GET['view'] ?? 'overview');
-    $view = ['event' => 'events', 'walkin' => 'requests'][$view] ?? $view;
+    $view = ['event' => 'events', 'walkin' => 'requests', 'team' => 'settings', 'categories' => 'settings'][$view] ?? $view;
     return ($linkQuery['view'] ?? 'overview') === $view;
 }
 
@@ -109,6 +109,12 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
     $u = $_SESSION['user'];
     $cur = ltrim(substr($_SERVER['SCRIPT_NAME'], strlen(APP_BASE)), '/');
     $roleLabel = ['admin' => 'Office Admin', 'student' => 'Student'][$u['role']];
+    $guidanceRole = g_staff($u);
+    $accountMenu = is_filer($u) || $guidanceRole !== null;
+    if ($guidanceRole) $roleLabel = ['head'=>'Guidance Head','counselor'=>'Counselor','administrator'=>'Guidance Administrator'][$guidanceRole];
+    $settingsHref = ($guidanceRole || defined('GD_PASSWORD_PAGE') || str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/guidance/')) ? 'guidance/index.php?view=settings' : 'student/settings.php';
+    $navigation = nav_for($u);
+    $hasNavGroups = (bool)array_filter($navigation, fn($item) => isset($item[3]) && is_array($item[3]));
     $nUnread = notif_unread($pdo, (int)$u['id']); $nItems = notif_recent($pdo, (int)$u['id'], 8);
     $avatar = null;
     if (is_filer($u)) { try { $av = $pdo->prepare('SELECT avatar_path FROM users WHERE id=?'); $av->execute([$u['id']]); $avatar = $av->fetchColumn() ?: null; } catch (Throwable $e) { /* photo column not added yet */ } }
@@ -120,6 +126,7 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="<?= url('assets/style.css') ?>?v=<?= @filemtime(__DIR__ . '/../assets/style.css') ?>">
+<?php if ($hasNavGroups): ?><link rel="stylesheet" href="<?= e(url('guidance/assets/sidebar.css')) ?>?v=<?= (int)filemtime(__DIR__.'/../guidance/assets/sidebar.css') ?>"><?php endif; ?>
 </head><body>
 <aside class="sidebar" id="sidebar">
   <div class="sb-head"><img width="48" height="48" src="<?= url('assets/img/lcct-seal.png') ?>" alt="LCCT seal"><div><div class="brand"><?= APP_NAME_A ?><span><?= APP_NAME_B ?></span></div><small>College Helpdesk</small></div></div>
@@ -129,13 +136,24 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
   <?php endif; ?>
 
   <nav class="nav">
-    <?php foreach (nav_for($u) as [$label, $href, $icon]): ?>
-      <?php if ($href === null): ?><div class="nav-sec"><?= e($label) ?></div>
+    <?php foreach ($navigation as $item): [$label, $href, $icon] = $item; ?>
+      <?php if (isset($item[3]) && is_array($item[3])):
+          $children = $item[3];
+          $groupActive = (bool)array_filter($children, fn($child) => nav_is_active($cur, $child[1])); ?>
+        <details class="gd-nav-group<?= $groupActive ? ' has-active' : '' ?>"<?= $groupActive ? ' open' : '' ?>>
+          <summary><i class="fa-solid <?= e($icon) ?>" aria-hidden="true"></i><span><?= e($label) ?></span><svg class="gd-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></summary>
+          <div class="gd-nav-group-links">
+          <?php foreach ($children as [$childLabel, $childHref, $childIcon]): $isActive = nav_is_active($cur, $childHref); ?>
+            <a href="<?= e(url($childHref)) ?>" class="<?= $isActive ? 'active' : '' ?>"<?= $isActive ? ' aria-current="page"' : '' ?>><i class="fa-solid <?= e($childIcon) ?>" aria-hidden="true"></i><?= e($childLabel) ?></a>
+          <?php endforeach; ?>
+          </div>
+        </details>
+      <?php elseif ($href === null): ?><div class="nav-sec"><?= e($label) ?></div>
       <?php else: $isActive = nav_is_active($cur, $href); ?><a href="<?= url($href) ?>" class="<?= $isActive ? 'active' : '' ?>"<?= $isActive ? ' aria-current="page"' : '' ?>><i class="fa-solid <?= $icon ?>"></i><?= e($label) ?></a><?php endif; ?>
     <?php endforeach; ?>
   </nav>
   <div class="sb-credit"><img height="30" src="<?= url('assets/img/intel-logo.png') ?>" alt="INTEL"><div>Powered by<b>INTEL</b></div></div>
-  <?php if (!is_filer($u)): ?>
+  <?php if (!$accountMenu): ?>
   <div class="sb-user">
     <div class="avatar"><?= e(strtoupper(substr($u['full_name'], 0, 1))) ?></div>
     <div class="who"><div class="n"><?= e($u['full_name']) ?></div><div class="r"><?= $roleLabel ?></div></div>
@@ -155,13 +173,12 @@ function page_start(string $title, string $sub = '', string $actions = ''): void
         <div class="bell-list" id="bellList"><?= notif_items_html($nItems) ?></div>
       </div>
     </div>
-    <?php if (is_filer($u)): ?><div class="tb-user" id="tbUser">
+    <?php if ($accountMenu): ?><div class="tb-user" id="tbUser">
       <button type="button" class="who" id="tbBtn" aria-haspopup="true" aria-expanded="false" title="Account"><?= avatar_html($u['full_name'], $avatar, 40) ?><span class="nm"><?= e($u['full_name']) ?><small><?= $roleLabel ?></small></span><i class="fa-solid fa-chevron-down chev"></i></button>
       <div class="tb-menu" id="tbMenu" role="menu">
-        <a class="tb-head" href="<?= url('student/profile.php') ?>"><?= avatar_html($u['full_name'], $avatar, 46) ?><span><b><?= e($u['full_name']) ?></b><small>See your profile</small></span></a>
+        <a class="tb-head" href="<?= e(url($settingsHref)) ?>"><?= avatar_html($u['full_name'], $avatar, 46) ?><span><b><?= e($u['full_name']) ?></b><small>Account settings</small></span></a>
         <div class="tb-sep"></div>
-        <a role="menuitem" href="<?= url('student/profile.php') ?>"><i class="fa-solid fa-user"></i>My profile</a>
-        <a role="menuitem" href="<?= url('auth/change_password.php') ?>"><i class="fa-solid fa-key"></i>Change password</a>
+        <a role="menuitem" href="<?= e(url($settingsHref)) ?>"><i class="fa-solid fa-gear"></i>Settings</a>
         <div class="tb-sep"></div>
         <a role="menuitem" class="tb-out" href="<?= url('auth/logout.php') ?>"><i class="fa-solid fa-right-from-bracket"></i>Sign out</a>
       </div>

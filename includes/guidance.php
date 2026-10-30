@@ -130,18 +130,37 @@ function g_notice(int $ticketId, ?int $only = null): void
         }notif_add($GLOBALS['pdo'], (int)$r['id'], $ticketId, 'Guidance request updated', 'Open the shared portal to view your authorized request.');
     }
 }
+/** Navigation grouping only. Endpoints still enforce their existing permissions. */
 function g_nav(array $u): array
 {
-    $items = [['Guidance',null,null],['Guidance overview','guidance/index.php','fa-people-group'],['Requests','guidance/index.php?view=requests','fa-ticket'],['Appointments','guidance/index.php?view=appointments','fa-calendar'],['Activities','guidance/index.php?view=events','fa-calendar-days'],['Programs','guidance/index.php?view=programs','fa-seedling'],['Calendar','guidance/index.php?view=calendar','fa-calendar-week'],['Participation & credits','guidance/index.php?view=history','fa-award'],['Knowledge','guidance/index.php?view=knowledge','fa-book-open']];
-    if (g_staff($u)) {
-        $items[] = ['Aggregate reports','guidance/index.php?view=reports','fa-chart-column'];
+    $role = g_staff($u);
+    $student = is_filer($u);
+    $heading = $student ? 'Student · My work' : (['head'=>'Guidance Head · My work','counselor'=>'Counselor · My work','administrator'=>'Administrator · My work'][$role ?? ''] ?? 'Guidance');
+    $items = [[$heading,null,null],['Overview','guidance/index.php','fa-people-group']];
+    if ($student || in_array($role, ['head','counselor'], true)) {
+        $requestLabel = $student ? 'My requests' : ($role === 'head' ? 'Requests & assignments' : 'Assigned requests');
+        $items[] = [$requestLabel,'guidance/index.php?view=requests','fa-ticket'];
+        $items[] = [$role === 'head' ? 'All appointments' : 'My appointments','guidance/index.php?view=appointments','fa-calendar'];
     }
-    if (g_head($u)) {
-        foreach (['team' => 'Guidance team','categories' => 'Services','privacy' => 'Privacy reviews','audit' => 'Guidance audit'] as $v => $label) {
-            $items[] = [$label,'guidance/index.php?view='.$v,'fa-shield-halved'];
-        }
+    if ($role === 'administrator') {
+        // This role's primary work is the existing activity operations page.
+        // Do not duplicate its Activities link inside the shared group.
+        $items[] = ['Activity operations','guidance/index.php?view=events','fa-calendar-days'];
     }
-    $items[] = ['My Guidance settings','guidance/index.php?view=settings','fa-gear'];
+    if ($student) $items[] = ['Certificates & credits','guidance/index.php?view=history','fa-award'];
+    if ($role === 'head') {
+        $items[] = ['Privacy reviews','guidance/index.php?view=privacy','fa-shield-halved'];
+        $items[] = ['Guidance audit','guidance/index.php?view=audit','fa-clipboard-list'];
+    }
+    $shared = [];
+    if ($role !== 'administrator') $shared[] = ['Activities','guidance/index.php?view=events','fa-calendar-days'];
+    $shared[] = ['Programs','guidance/index.php?view=programs','fa-seedling'];
+    $shared[] = ['Calendar','guidance/index.php?view=calendar','fa-calendar-week'];
+    if (!$student) $shared[] = ['Certificates & credits','guidance/index.php?view=history','fa-award'];
+    $shared[] = ['Resources','guidance/index.php?view=knowledge','fa-book-open'];
+    if ($role) $shared[] = ['Aggregate reports','guidance/index.php?view=reports','fa-chart-column'];
+    // A fourth array element represents a collapsible group, not another route.
+    $items[] = ['Shared Guidance tools',null,'fa-layer-group',$shared];
     return $items;
 }
 function g_signature(array $u): string
